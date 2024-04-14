@@ -1,0 +1,6 @@
+.outlinedToday :global(.PrivatePickersSlideTransition-root) button:not(:global(.Mui-disabled)){
+    color: rgb(23, 216, 136);
+    font-weight: 900;
+    border: 1px solid rgb(23, 216, 136);
+    border-radius: 50%;
+}

@@ -1,0 +1,109 @@
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { publicUserAuth, publicUserStorage } from "../../../firebase.config";
+import { useAuthState } from "react-firebase-hooks/auth";
+
+import { LinearProgress, Typography } from "@mui/material";
+// import { publicUserAuth } from "../../../firebase.config";
+
+const PublicUserUploadFile = () => {
+ 
+  const [selectedFile, setSelectedFile] = useState();
+  const [user] = useAuthState(publicUserAuth);
+  let [progress, setProgress] = useState(null);
+  const [error, setError] = useState(null);
+  // Create the file metadata
+  /** @type {any} */
+  /* const metadata = {
+    contentType: "image/jpeg",
+  }; */
+
+  // Upload file and metadata to the object 'images/mountains.jpg'
+
+  // Listen for state changes, errors, and completion of the upload.
+  console.log(selectedFile);
+  const handleUpload = () => {
+    const size = selectedFile?.size / 1000000;
+    if (size <= 100) {
+      if (error) {
+        setError(null);
+      }
+      const storageRef = ref(
+        publicUserStorage,
+        `client/${user?.email}/` + selectedFile?.name + "-" + uuidv4()
+      );
+
+      const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          setProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+
+          console.log("Upload is " + progress + "% done");
+          switch (snapshot.state) {
+            case "paused":
+              console.log("Upload is paused");
+              break;
+            case "running":
+              console.log("Upload is running");
+              break;
+          }
+        },
+        (error) => {
+          // A full list of error codes is available at
+          // https://firebase.google.com/docs/storage/web/handle-errors
+          switch (error.code) {
+            case "storage/unauthorized":
+              // User doesn't have permission to access the object
+              break;
+            case "storage/canceled":
+              // User canceled the upload
+              break;
+
+            // ...
+
+            case "storage/unknown":
+              // Unknown error occurred, inspect error.serverResponse
+              break;
+          }
+        },
+        async () => {
+          // Upload completed successfully, now we can get the download URL
+          await getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            console.log("File available at", downloadURL);
+          });
+        }
+      );
+    } else {
+      setError("File Size Can Not Exceed 100MB");
+    }
+  };
+  return (
+    <div>
+      <p>
+        {/* {error && <strong>Error: {error.message}</strong>}
+        {uploading && <span>Uploading file...</span>}
+        {snapshot && <span>Snapshot: {JSON.stringify(snapshot)}</span>}
+        {selectedFile && <span>Selected file: {selectedFile.name}</span>} */}
+        <input
+          type="file"
+          onChange={(e) => {
+            const file = e.target.files ? e.target.files[0] : undefined;
+            setSelectedFile(file);
+          }}
+        />
+        <button onClick={handleUpload}>Upload file</button>
+        {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
+        {progress && <LinearProgress variant="determinate" value={progress} />}
+      </p>
+    </div>
+  );
+};
+export default PublicUserUploadFile;

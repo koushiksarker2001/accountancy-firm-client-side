@@ -1,0 +1,337 @@
+.SelectPsychotherapist {
+  margin-top: 8rem;
+}
+
+.ourPsychologist {
+  box-shadow: -1px 11px 68px -18px rgba(0, 0, 0, 0.74);
+  -webkit-box-shadow: -1px 11px 68px -18px rgba(0, 0, 0, 0.74);
+  -moz-box-shadow: -1px 11px 68px -18px rgba(0, 0, 0, 0.74);
+}
+
+/* .searching_container {
+      display: fle;
+  } */
+
+.psychologist-img {
+  margin-top: 1rem;
+  width: 15rem;
+  height: 15rem !important;
+  object-fit: contain;
+  border-radius: 100px;
+}
+
+.select {
+  width: 200px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.select:focus {
+  outline: none;
+}
+
+.searching_container {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.searching_container p {
+  margin: 0;
+}
+
+.category_filter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* margin-top: 120px; */
+}
+
+.flex_center {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+  align-items: center;
+}
+
+.exp {
+  /* position: absolute;
+      bottom: 0;
+      right: 0; */
+  /* z-index: 10; */
+  /* background-color: rgb(49, 199, 90);
+      color: #fff; */
+  margin: 5px;
+  text-align: center;
+}
+
+.all_psychologist {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.psychologist_booking {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr 2fr 1fr 2fr;
+}
+
+.selected_psy_image {
+  margin-top: 0.5rem;
+  width: 15rem;
+  height: 15rem;
+  object-fit: contain;
+}
+
+@media screen and (max-width: 960px) {
+  .all_psychologist {
+    grid-template-columns: 1fr;
+
+    justify-items: center;
+  }
+
+  .psychologist_booking {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .selected_psy_image {
+    width: 10rem;
+    height: 10rem;
+  }
+
+  .searching_container {
+    flex-direction: column;
+  }
+
+  .category_filter {
+    margin-top: 0px;
+    margin-bottom: 20px;
+  }
+
+  .flex_center {
+    flex-direction: column;
+  }
+}
+
+@font-face {
+  font-family: "Poppins";
+  src: url("https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap");
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,700&display=swap");
+}
+.psychologist-box {
+  text-align: center;
+  justify-content: center;
+  padding: 5px 15px 15px 15px;
+  border-radius: 20px;
+  background-color: #e9faed;
+  box-shadow: 0px 17px 15px 5px #dad6d6;
+}
+
+.fpZpvl {
+  border-radius: 10px;
+}
+
+.psychologist-container {
+  padding: 38px;
+}
+
+.psychologist-img {
+  margin-top: 1rem;
+  width: 10rem !important;
+  height: 10rem !important;
+  object-fit: contain;
+  border-radius: 100px;
+}
+
+.selectedPsychologist-box {
+  text-align: center;
+  justify-content: center;
+  padding: 0px 10px 10px 10px;
+  border-radius: 20px;
+  /* background-color: #E9FAED;
+          box-shadow: 0px 17px 15px 5px #dad6d6; */
+}
+
+.selectedPsychologistImg {
+  width: 100%;
+  height: 16rem !important;
+  width: 16rem !important;
+  border-radius: 25px !important;
+}
+
+.psychologist-name {
+  font-family: "Poppins";
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 30px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #ffc100;
+  margin-bottom: 0px;
+}
+
+.psychologist-title {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 5px;
+}
+
+.psychologist-recommend {
+  color: green;
+  font-size: 14px;
+  font-weight: 500;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.group-btn {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.swiper-button-prev {
+  color: #63e455;
+}
+
+.swiper-button-next {
+  color: #63e455;
+}
+
+.experience {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
+  background-color: rgb(49, 199, 90);
+  color: #fff;
+  padding: 2px;
+}
+.group-37417 {
+  width: 295px;
+  height: 440px;
+  margin: 15% 0;
+}
+
+.rectangle-59 {
+  width: 295px;
+  height: 550px;
+  background-color: linear-gradient(0deg, #e9faed, #e9faed),
+    linear-gradient(0deg, #ffffff, #ffffff);
+  border: 8px solid #e9faed;
+  border-radius: 48px;
+  box-shadow: 0px 4px 10px -28px #00000040;
+  transition: all;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.3s;
+}
+.rectangle-59:hover {
+  border: 8px solid #31c75a;
+  transition: all;
+  transition-duration: 0.5s;
+}
+.avatar {
+  position: relative;
+  width: 151px;
+  height: 151px;
+}
+.image-60 {
+  /*  width: 151px;
+        height: 151px; */
+  position: absolute;
+  top: 250px;
+  left: 121px;
+  border-radius: 75.5px;
+}
+.pricing-text {
+  font-family: "Poppins";
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 30px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: #1d9bf0;
+  margin-top: -20px;
+}
+.details-text {
+  font-family: "Poppins";
+  color: #3f3d56;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0em;
+  text-align: center;
+  padding: 0 50px;
+  margin-top: -15px;
+}
+.booking-button-custom {
+  width: 263px;
+  height: 62px;
+  background: #31c75a;
+  padding: 10px;
+  border-radius: 61px;
+  margin: 0 5px;
+  margin-left: 6.9px !important;
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  transition: all;
+  transition-duration: 0.1s;
+  transition-timing-function: ease-in-out;
+}
+.booking-button-custom:hover {
+  border: 4px solid #e9faed;
+  background: #ffffff;
+  transform: scale(0.9);
+}
+
+.booking-button-custom p {
+  font-family: "DM Sans", sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: 0em;
+  text-align: center;
+  color: white;
+}
+.booking-button-custom:hover p {
+  color: #686868;
+}
+.review {
+  /* margin-bottom: ; */
+}
+.faded-text {
+  /* Set the same font size as sliced text */
+  font-family: "Poppins";
+  color: transparent; /* Make text color transparent */
+  background: linear-gradient(
+    to right,
+    rgb(0, 0, 0),
+    rgba(0, 0, 0, 0.8),
+    rgba(0, 0, 0, 0.6),
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0.2)
+  );
+  /* Add a gradient background to create the fade effect */
+  background-clip: text;
+}
+
+.psychologist-image-square {
+  position: relative;
+}
+.verified-image {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}

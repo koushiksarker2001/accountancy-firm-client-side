@@ -1,0 +1,11 @@
+.submit-button-login-signup {
+  /* display: block; */
+  padding: 10px;
+  background-color: beige;
+  border: none;
+  border-radius: 10px;
+}
+.submit-button-login-signup:hover {
+  background-color: antiquewhite;
+  cursor: pointer;
+}
