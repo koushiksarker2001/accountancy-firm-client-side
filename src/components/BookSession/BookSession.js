@@ -1,6 +1,6 @@
 import TextField from "@mui/material/TextField";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { employeeAuth } from "../../firebase.config";
+import { employeeAuth, publicUserAuth } from "../../firebase.config";
 import AppAppBar from "../LandingPage/AppAppBar";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
@@ -61,7 +61,7 @@ const BookSession = () => {
   const [item, setParsedItem] = useState();
   let [error, setError] = useState(null);
   let [success, setSuccess] = useState("");
-  const [user] = useAuthState(employeeAuth);
+  const [user] = useAuthState(publicUserAuth);
 
   const bookingEndRef = useRef(null);
 
@@ -693,20 +693,29 @@ const BookSession = () => {
                 ) : null}
               </Grid>
 
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  margin: "2rem 0 5rem 0",
-                }}
-              >
-                {selectedEmployees?.availableDateTimes?.map(
-                  (qtm) =>
-                    qtm.date == value && (
-                      <>{value && selectedStartTime && <BookSessionForm />}</>
-                    )
-                )}
-              </div>
+              {user ? (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    margin: "2rem 0 5rem 0",
+                    width: "100%",
+                  }}
+                >
+                  {selectedEmployees?.availableDateTimes?.map(
+                    (qtm) =>
+                      qtm.date == value && (
+                        <>
+                          {value && selectedStartTime && (
+                            <BookSessionForm parsedItem={item} />
+                          )}
+                        </>
+                      )
+                  )}
+                </div>
+              ) : (
+                "Not logged in"
+              )}
             </>
           ) : (
             <></>

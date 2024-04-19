@@ -22,6 +22,7 @@ import ChatDashBoard from "./components/ChatDashboard/ChatDashBoard.js";
 import ChatContextProvider from "./components/Contexts/ChatContext.js";
 import ChatDashBoardEmployee from "./components/ChatDashboardEmployee/ChatDashboardEmployee.js";
 import ChatEmployee from "./components/Chat/ChatEmployee.js";
+import EmployeeSession from "./components/EmployeeDashboard/EmployeeSession/EmployeeSession.js";
 function App() {
   return (
     <div>
@@ -46,6 +47,14 @@ function App() {
             element={
               <EmployeeRequireAuth>
                 <EmployeeCreateSlots />
+              </EmployeeRequireAuth>
+            }
+          />
+          <Route
+            path="session"
+            element={
+              <EmployeeRequireAuth>
+                <EmployeeSession />
               </EmployeeRequireAuth>
             }
           />
