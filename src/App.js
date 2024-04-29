@@ -23,6 +23,7 @@ import ChatContextProvider from "./components/Contexts/ChatContext.js";
 import ChatDashBoardEmployee from "./components/ChatDashboardEmployee/ChatDashboardEmployee.js";
 import ChatEmployee from "./components/Chat/ChatEmployee.js";
 import EmployeeSession from "./components/EmployeeDashboard/EmployeeSession/EmployeeSession.js";
+import EmployeeSessionList from "./components/EmployeeDashboard/EmployeeSessionList/EmployeeSessionList.js";
 function App() {
   return (
     <div>
@@ -50,19 +51,28 @@ function App() {
               </EmployeeRequireAuth>
             }
           />
-          <Route
-            path="session"
-            element={
-              <EmployeeRequireAuth>
-                <EmployeeSession />
-              </EmployeeRequireAuth>
-            }
-          />
+
           <Route
             path="create-user"
             element={
               <EmployeeRequireAuth>
                 <UserCreate />
+              </EmployeeRequireAuth>
+            }
+          />
+          <Route
+            path="session"
+            element={
+              <EmployeeRequireAuth>
+                <EmployeeSessionList />
+              </EmployeeRequireAuth>
+            }
+          />
+          <Route
+            path="session/:id"
+            element={
+              <EmployeeRequireAuth>
+                <EmployeeSession />
               </EmployeeRequireAuth>
             }
           />
