@@ -11,6 +11,7 @@ import AgoraRTC, {
   useRemoteUsers,
   RemoteUser,
   LocalVideoTrack,
+  useRemoteVideoTracks,
 } from "agora-rtc-react";
 import { employeeAuth } from "../../../firebase.config";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -37,7 +38,7 @@ const styles = {
     height: "100%",
     display: "grid",
   },
-  gridCell: { height: "100%", width: "100%" },
+  gridCell: { height: "500", width: "700" },
   container: {
     display: "flex",
     flexDirection: "column",
@@ -93,37 +94,73 @@ const EmployeeSession = () => {
 const VideoCall = (props) => {
   const { setInCall, channelName, inCall, email, session, appId, token } =
     props;
-  const { isLoading: isLoadingMic, localMicrophoneTrack } =
-    useLocalMicrophoneTrack();
-  const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack();
-  const remoteUsers = useRemoteUsers();
-  const { audioTracks } = useRemoteAudioTracks(remoteUsers);
-  audioTracks?.map((track) => track.play());
+  const [activeConnection, setActiveConnection] = useState(true);
+  const [micOn, setMic] = useState(true);
+  const [cameraOn, setCamera] = useState(true);
+  const { localMicrophoneTrack } = useLocalMicrophoneTrack(micOn);
+  const { localCameraTrack } = useLocalCameraTrack(cameraOn);
+
+  // videoTracks?.map((videotrack) => videotrack?.play());
+
+  useJoin(
+    {
+      appid: appId,
+      channel: channelName,
+      token: null,
+    },
+    activeConnection
+  );
   usePublish([localMicrophoneTrack, localCameraTrack]);
-  useJoin({
-    appid: appId,
-    channel: channelName,
-    token: token === "" ? null : token,
-  });
-  const deviceLoading = isLoadingMic || isLoadingCam;
+
+  const remoteUsers = useRemoteUsers();
+
+  const { audioTracks } = useRemoteAudioTracks(remoteUsers);
+  audioTracks?.forEach((track) => track.play());
+  /*  const deviceLoading = isLoadingMic || isLoadingCam;
   if (deviceLoading) {
     return <div style={styles.grid}>Loading devices...</div>;
-  } else {
-    return (
+  } else { */
+  return (
+    <div>
+      {remoteUsers?.map((user) => (
+        <RemoteUser user={user} />
+      ))}
+      <div style={{ height: 300, width: 600 }}>
+        <LocalVideoTrack
+          videoTrack={localCameraTrack}
+          audioTrack={localMicrophoneTrack}
+          cameraOn={cameraOn}
+          micOn={micOn}
+          playAudio={micOn}
+          playVideo={cameraOn}
+          style={styles.gridCell}
+        />
+      </div>
       <div>
-        <div style={{ ...styles.grid, ...returnGrid(remoteUsers) }}>
-          <LocalVideoTrack
-            track={localCameraTrack}
-            play={true}
-            style={styles.gridCell}
-          />
-          {remoteUsers?.map((user) => (
-            <RemoteUser user={user} style={styles.gridCell} />
-          ))}
+        {/* media-controls toolbar component - UI controling mic, camera, & connection state  */}
+        <div id="controlsToolbar">
+          <div id="mediaControls">
+            <button className="btn" onClick={() => setMic((a) => !a)}>
+              Mic
+            </button>
+            <button className="btn" onClick={() => setCamera((a) => !a)}>
+              Camera
+            </button>
+          </div>
+          <button
+            id="endConnection"
+            onClick={() => {
+              setActiveConnection(false);
+              // navigate('/')
+            }}
+          >
+            {" "}
+            Disconnect
+          </button>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 };
 //channel join form component
 const ChannelForm = (props) => {
