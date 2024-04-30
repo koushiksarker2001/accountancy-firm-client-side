@@ -17,6 +17,7 @@ import style from "./styles.module.css";
 import { Box, Button, Container, FormControl, Rating } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import BookSessionForm from "./BookSessionForm";
+import { DateTime } from "luxon";
 
 /* const renderWeekPickerDay = (date, selectedDates, pickersDayProps) => {
   return (
@@ -137,6 +138,7 @@ const BookSession = () => {
   }, [date]);
 
   const handleValue = (newValue) => {
+    console.log(newValue);
     const weekday = [
       "Sunday",
       "Monday",
@@ -146,27 +148,12 @@ const BookSession = () => {
       "Friday",
       "Saturday",
     ];
-    const addDate = newValue.toISOString().slice(8, 10);
-    // console.log(addDate, newValue);
-    const parseAddDate = parseInt(addDate) + 1;
-    const actualDate = parseAddDate < 10 ? `0${parseAddDate}` : parseAddDate;
-    // console.log(actualDate);
-    const selectedDate = new Date(
-      (
-        newValue.toISOString().slice(0, 8) +
-        actualDate +
-        newValue.toISOString().slice(11)
-      ).slice(0, 10)
-    );
 
-    console.log(selectedDate);
+    const date = newValue.toISOString();
+    const formatted = DateTime.fromISO(date).toString();
+    const selectedDate = newValue;
     setValue(weekday[selectedDate.getDay()]);
-    setDate(
-      newValue.toISOString().slice(0, 8) +
-        parseAddDate +
-        newValue.toISOString().slice(11)
-    );
-
+    setDate(formatted);
     setSelectedStartTime("");
     setSelectedEndTime("");
   };

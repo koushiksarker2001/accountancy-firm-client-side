@@ -1,53 +1,35 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
-import AgoraRTC, {
-  AgoraRTCProvider,
-  useJoin,
-  useLocalCameraTrack,
-  useLocalMicrophoneTrack,
-  usePublish,
-  useRTCClient,
-  useRemoteAudioTracks,
-  useRemoteUsers,
-  RemoteUser,
-  LocalVideoTrack,
-  useRemoteVideoTracks,
+import {
+  AgoraVideoPlayer,
+  createClient,
+  createMicrophoneAndCameraTracks,
 } from "agora-rtc-react";
 import { employeeAuth } from "../../../firebase.config";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import { Button } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import { DateTime } from "luxon";
-const returnGrid = (remoteUsers) => {
-  return {
-    gridTemplateColumns:
-      remoteUsers?.length > 8
-        ? unit.repeat(4)
-        : remoteUsers.length > 3
-        ? unit.repeat(3)
-        : remoteUsers.length > 0
-        ? unit.repeat(2)
-        : unit,
-  };
+import classes from "./videoCss.css";
+import PersonIcon from "@mui/icons-material/Person";
+import ChatIcon from "@mui/icons-material/Chat";
+import CallEndIcon from "@mui/icons-material/CallEnd";
+import MicOffIcon from "@mui/icons-material/MicOff";
+import ModeCommentIcon from "@mui/icons-material/ModeComment";
+import KeyboardVoiceIcon from "@mui/icons-material/KeyboardVoice";
+
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+
+import VideocamIcon from "@mui/icons-material/Videocam";
+import Messaging from "./Messaging";
+const config = {
+  mode: "rtc",
+  codec: "vp8",
 };
-const unit = "minmax(0, 1fr) ";
-const styles = {
-  grid: {
-    width: "100%",
-    height: "100%",
-    display: "grid",
-  },
-  gridCell: { height: "500", width: "700" },
-  container: {
-    display: "flex",
-    flexDirection: "column",
-    flex: 1,
-    justifyContent: "center",
-  },
-};
+const appId = "78de4173294f407d9d8312ee1a8ba1bd";
+
 const EmployeeSession = () => {
-  const appId = "78de4173294f407d9d8312ee1a8ba1bd";
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -56,25 +38,21 @@ const EmployeeSession = () => {
   const [session, setSession] = useState("");
   const [user] = useAuthState(employeeAuth);
   const [rejoin, setRejoin] = useState(false);
-  const client = useRTCClient(
-    AgoraRTC.createClient({ codec: "vp8", mode: "rtc" })
-  );
+
   const token = null;
   return (
     <div>
       {inCall ? (
-        <AgoraRTCProvider client={client}>
-          <VideoCall
-            setInCall={setInCall}
-            channelName={channelName}
-            inCall={inCall}
-            session={session}
-            email={user?.email}
-            setRejoin={setRejoin}
-            appId={appId}
-            token={token}
-          ></VideoCall>
-        </AgoraRTCProvider>
+        <VideoCall
+          setInCall={setInCall}
+          channelName={channelName}
+          inCall={inCall}
+          session={session}
+          email={user?.email}
+          setRejoin={setRejoin}
+          appId={appId}
+          token={token}
+        ></VideoCall>
       ) : (
         <ChannelForm
           setInCall={setInCall}
@@ -91,77 +69,289 @@ const EmployeeSession = () => {
   );
 };
 // video call component
+const useClient = createClient(config);
+const useMicrophoneAndCameraTracks = createMicrophoneAndCameraTracks();
 const VideoCall = (props) => {
   const { setInCall, channelName, inCall, email, session, appId, token } =
     props;
-  const [activeConnection, setActiveConnection] = useState(true);
-  const [micOn, setMic] = useState(true);
-  const [cameraOn, setCamera] = useState(true);
-  const { localMicrophoneTrack } = useLocalMicrophoneTrack(micOn);
-  const { localCameraTrack } = useLocalCameraTrack(cameraOn);
+  const [users, setUsers] = useState([]);
+  const [start, setStart] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
+  const navigate = useNavigate("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // videoTracks?.map((videotrack) => videotrack?.play());
+  const [remoteuserVideo, setRemoteUserVideo] = useState(false);
+  const [remoteuserAudio, setRemoteUserAudio] = useState(true);
 
-  useJoin(
-    {
-      appid: appId,
-      channel: channelName,
-      token: null,
-    },
-    activeConnection
-  );
-  usePublish([localMicrophoneTrack, localCameraTrack]);
+  const [msgForVideo, setMsgForVideo] = useState("");
+  const [msgForAudio, setMsgForAudio] = useState("");
 
-  const remoteUsers = useRemoteUsers();
+  // using the hook to get access to the client object
+  const client = useClient();
 
-  const { audioTracks } = useRemoteAudioTracks(remoteUsers);
-  audioTracks?.forEach((track) => track.play());
-  /*  const deviceLoading = isLoadingMic || isLoadingCam;
-  if (deviceLoading) {
-    return <div style={styles.grid}>Loading devices...</div>;
-  } else { */
-  return (
-    <div>
-      {remoteUsers?.map((user) => (
-        <RemoteUser user={user} />
-      ))}
-      <div style={{ height: 300, width: 600 }}>
-        <LocalVideoTrack
-          videoTrack={localCameraTrack}
-          audioTrack={localMicrophoneTrack}
-          cameraOn={cameraOn}
-          micOn={micOn}
-          playAudio={micOn}
-          playVideo={cameraOn}
-          style={styles.gridCell}
+  // ready is a state variable, which returns true when the local tracks are initialized, untill then tracks variable is null
+  const { ready, tracks } = useMicrophoneAndCameraTracks();
+
+  const handleShow = () => {
+    setShowMessage(!showMessage);
+  };
+  useEffect(() => {
+    // function to initialise the SDK
+    let init = async (name) => {
+      setIsLoading(true);
+
+      console.log("users", users);
+
+      client.on("user-published", async (user, mediaType) => {
+        if (users.length < 1) {
+          await client.subscribe(user, mediaType);
+          if (mediaType === "video") {
+            setUsers((prevUsers) => {
+              return [...prevUsers, user];
+            });
+          }
+          if (mediaType === "audio") {
+            user.audioTrack?.play();
+          }
+        }
+      });
+
+      client.on("user-unpublished", (user, type) => {
+        if (type === "audio") {
+          user.audioTrack?.stop();
+        }
+        if (type === "video") {
+          setUsers((prevUsers) => {
+            return prevUsers.filter((User) => User.uid !== user.uid);
+          });
+        }
+      });
+
+      client.on("user-left", (user) => {
+        setUsers((prevUsers) => {
+          return prevUsers.filter((User) => User.uid !== user.uid);
+        });
+        // client.leave();
+        // client.removeAllListeners();
+
+        // we close the tracks to perform cleanup
+        // tracks[0].close();
+        // tracks[1].close();
+        // setRejoin(true);
+        // navigate(`/Dashboard/review/${session._id}`);
+      });
+
+      await client.join(appId, name, token, null);
+
+      // await client.
+      // tracks[1].setEnabled(false)
+      if (tracks) await client.publish([tracks[0], tracks[1]]);
+      setIsLoading(false);
+      setStart(true);
+    };
+
+    if (ready && tracks) {
+      init(channelName);
+    }
+  }, [channelName, client, ready, tracks]);
+  return isLoading ? (
+    <div className={classes.video_container_double_blank}></div>
+  ) : (
+    <div className={classes.video_container_double}>
+      {start && tracks && (
+        <Videos
+          remoteuserAudio={remoteuserAudio}
+          remoteuserVideo={remoteuserVideo}
+          users={users}
+          tracks={tracks}
+          showMessage={showMessage}
+          totalUser={client?._users}
         />
+      )}
+      {ready && tracks && (
+        <Controls
+          setMsgForAudio={setMsgForAudio}
+          setMsgForVideo={setMsgForVideo}
+          msgForVideo={msgForVideo}
+          tracks={tracks}
+          users={users}
+          setStart={setStart}
+          setInCall={setInCall}
+          setShowMessage={handleShow}
+          showMessage={showMessage}
+          session={session}
+          setUsers={setUsers}
+        />
+      )}
+      {/*    {start && tracks && (
+        <Messaging
+          setRemoteUserAudio={setRemoteUserAudio}
+          setRemoteUserVideo={setRemoteUserVideo}
+          setMsgForVideo={setMsgForVideo}
+          msgForVideo={msgForVideo}
+          channelName={channelName}
+          users={users}
+          inCall={inCall}
+          email={email}
+          showMessage={showMessage}
+        />
+      )} */}
+    </div>
+  );
+};
+
+const Videos = (props) => {
+  const { totalUser, users, tracks, showMessage } = props;
+  let remoteUi = null;
+
+  console.log("tracks", tracks);
+
+  if (totalUser?.length <= 0) {
+    remoteUi = <div className={classes.vid}>No one joined yet</div>;
+  } else if (totalUser?.length > 0 && users.length > 0) {
+    remoteUi = (
+      <AgoraVideoPlayer
+        className={classes.vid}
+        videoTrack={users[0]?.videoTrack}
+        key={users[0]?.uid}
+      />
+    );
+  } else if (totalUser?.length > 0 && users.length <= 0) {
+    remoteUi = (
+      <div className={classes.vid}>
+        <PersonIcon style={{ width: "100px", height: "100px" }} />
       </div>
-      <div>
-        {/* media-controls toolbar component - UI controling mic, camera, & connection state  */}
-        <div id="controlsToolbar">
-          <div id="mediaControls">
-            <button className="btn" onClick={() => setMic((a) => !a)}>
-              Mic
-            </button>
-            <button className="btn" onClick={() => setCamera((a) => !a)}>
-              Camera
-            </button>
-          </div>
-          <button
-            id="endConnection"
-            onClick={() => {
-              setActiveConnection(false);
-              // navigate('/')
-            }}
-          >
-            {" "}
-            Disconnect
-          </button>
-        </div>
+    );
+  }
+  return (
+    <div className={!showMessage ? classes.relative : classes.relative_two}>
+      <Grid id="videos" className={classes.videos} spacing={3} container>
+        <Grid
+          className={classes.video}
+          justifyContent="center"
+          item
+          md={12}
+          xs={12}
+        >
+          {remoteUi}
+        </Grid>
+      </Grid>
+      <div className={classes.patient}>
+        <AgoraVideoPlayer className={classes.myself} videoTrack={tracks[1]} />
       </div>
     </div>
   );
 };
+
+export const Controls = (props) => {
+  const client = useClient();
+  const {
+    tracks,
+    users,
+    setStart,
+    setInCall,
+    setShowMessage,
+    showMessage,
+    session,
+    setMsgForVideo,
+    msgForVideo,
+    setMsgForAudio,
+    setUsers,
+  } = props;
+  const [trackState, setTrackState] = useState({ video: false, audio: true });
+  const navigate = useNavigate("");
+
+  const mute = async (type) => {
+    if (type === "audio") {
+      await tracks[0].setEnabled(!trackState.audio);
+      if (trackState.audio) {
+        setMsgForAudio("PERMISSION_AUDIO_DISABLE");
+      }
+      if (!trackState.video) {
+        setMsgForAudio("PERMISSION_AUDIO_ENABLE");
+      }
+      setTrackState((ps) => {
+        return { ...ps, audio: !ps.audio };
+      });
+    } else if (type === "video") {
+      await tracks[1].setEnabled(!trackState.video);
+      // tracks[1].video.disable = false;
+
+      if (trackState.video) {
+        setMsgForVideo("PERMISSION_VIDEO_DISABLE");
+      }
+      if (!trackState.video) {
+        setMsgForVideo("PERMISSION_VIDEO_ENABLE");
+      }
+      setTrackState((ps) => {
+        return { ...ps, video: !ps.video };
+      });
+    }
+  };
+
+  useEffect(() => {
+    mute("video");
+    // if (tracks[1]?._id) {
+    // tracks[1].setEnabled(!trackState.video)
+    // setTrackState({ video: false, audio: true })
+    // }
+  }, []);
+
+  const leaveChannel = async () => {
+    await client.leave();
+    client.removeAllListeners();
+
+    // we close the tracks to perform cleanup
+    tracks[0].close();
+    tracks[1].close();
+    setTrackState({ video: false, audio: false });
+    setStart(false);
+    setInCall(false);
+    window.location.reload();
+
+    // navigate(`/Dashboard/review/${session._id}`);
+  };
+
+  return (
+    <>
+      <div style={{ margin: "0", padding: "0", display: "none" }}>
+        {/* <Header /> */}
+      </div>
+
+      <div className={classes.controls}>
+        <p
+          className={trackState.audio ? "on" : ""}
+          style={{ backgroundColor: !trackState.audio ? "#EA5044" : "" }}
+          onClick={() => mute("audio")}
+        >
+          {trackState.audio ? <KeyboardVoiceIcon /> : <MicOffIcon />}
+        </p>
+        <p
+          className={trackState.video ? "on" : ""}
+          style={{ backgroundColor: !trackState.video ? "#EA5044" : "" }}
+          onClick={() => mute("video")}
+        >
+          {trackState.video ? <VideocamIcon /> : <VideocamOffIcon />}
+        </p>
+        <p
+          onClick={setShowMessage}
+          style={{ backgroundColor: showMessage ? "#31C75A" : "" }}
+        >
+          {showMessage ? <ModeCommentIcon /> : <ChatIcon />}
+        </p>
+        {
+          <p
+            onClick={() => leaveChannel()}
+            style={{ backgroundColor: "#EA5044" }}
+          >
+            <CallEndIcon />
+          </p>
+        }
+      </div>
+    </>
+  );
+};
+
 //channel join form component
 const ChannelForm = (props) => {
   const { setInCall, setChannelName, setSession, session, id, navigate } =
@@ -215,10 +405,11 @@ const ChannelForm = (props) => {
   const time = now.getHours() + ":" + now.getMinutes();
 
   let currentTime = timeConverter(time);
-
+  console.log(currentTime);
   const verifiedTime =
     startTimeBuffer(session?.startTime) <= currentTime &&
     session?.endTime >= currentTime;
+
   console.log(session?.startTime);
   console.log(currentTime);
   console.log(session?.endTime >= currentTime);
@@ -253,9 +444,8 @@ const ChannelForm = (props) => {
   }, []);
   // verify the time if its today or passed
   const verified = session?.date === today;
-
+  console.log(verifiedTime);
   const verifiedPassed = session?.date < today;
-  console.log(verifiedPassed);
   // console.log(verified, verifiedPassed);
   // console.log(today);
   /* useEffect(() => {
