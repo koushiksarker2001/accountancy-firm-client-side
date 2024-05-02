@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
+import "./videoCss.css";
 import AgoraRTC, {
   AgoraRTCProvider,
   AgoraVideoPlayer,
@@ -130,11 +131,7 @@ const VideoCall = (props) => {
           // Initialize each remote stream using RemoteUser component
           remoteUsers?.length > 0 ? (
             remoteUsers.map((user) => (
-              <div
-                key={user.uid}
-                className="remote-video-container"
-                style={{ width: "500px", height: "500px" }}
-              >
+              <div key={user.uid} className="remote-video-container">
                 <RemoteUser user={user} />
               </div>
             ))
@@ -143,7 +140,7 @@ const VideoCall = (props) => {
           )
         }
       </div>
-      <div id="localVideo" style={{ height: "500px", width: "500px" }}>
+      <div id="localVideo">
         <LocalUser
           audioTrack={localMicrophoneTrack}
           videoTrack={localCameraTrack}
@@ -151,23 +148,43 @@ const VideoCall = (props) => {
           micOn={micOn}
           playAudio={false}
           playVideo={cameraOn}
-          style={{ height: "500px", width: "500px" }}
         />
         <div>
           {/* media-controls toolbar component - UI controling mic, camera, & connection state  */}
           <div id="controlsToolbar">
             <div id="mediaControls">
-              <button
-                className="btn"
-                onClick={() => {
-                  setMic(!micOn);
-                }}
-              >
-                Mic
-              </button>
-              <button className="btn" onClick={() => setCamera((a) => !a)}>
+              {micOn && (
+                <KeyboardVoiceIcon
+                  // className="btn"
+                  sx={{ color: "green" }}
+                  onClick={() => {
+                    setMic(false);
+                  }}
+                />
+              )}
+              {!micOn && (
+                <MicOffIcon
+                  onClick={() => {
+                    setMic(true);
+                  }}
+                  sx={{ color: "red" }}
+                />
+              )}
+              {cameraOn && (
+                <VideocamIcon
+                  sx={{ color: "green" }}
+                  onClick={() => setCamera(false)}
+                />
+              )}
+              {!cameraOn && (
+                <VideocamOffIcon
+                  sx={{ color: "red" }}
+                  onClick={() => setCamera(true)}
+                />
+              )}
+              {/*   <button className="btn" onClick={() => setCamera((a) => !a)}>
                 Camera
-              </button>
+              </button> */}
             </div>
             <button
               id="endConnection"
