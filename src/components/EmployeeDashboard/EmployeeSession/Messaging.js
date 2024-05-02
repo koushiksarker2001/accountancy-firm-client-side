@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import classes from "./videoCss.css";
 import { createChannel, createClient, RtmMessage } from "agora-rtm-react";
-// import chatIcon from "../../assets/images/chatIcon.png";
+
 import ChatIcon from "@mui/icons-material/Chat";
 const useClient = createClient("78de4173294f407d9d8312ee1a8ba1bd");
-// let patientEmail = JSON.parse(localStorage.getItem('patientEmail'));
+console.log(localStorage.getItem("sessionId"));
 const useChannel = createChannel(localStorage.getItem("sessionId"));
 
 export default function Messaging({

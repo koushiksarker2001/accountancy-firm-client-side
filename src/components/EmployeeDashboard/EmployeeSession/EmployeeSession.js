@@ -1,9 +1,19 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import React, { useEffect, useState } from "react";
-import {
+import AgoraRTC, {
+  AgoraRTCProvider,
   AgoraVideoPlayer,
+  LocalUser,
+  RemoteUser,
   createClient,
   createMicrophoneAndCameraTracks,
+  useJoin,
+  useLocalCameraTrack,
+  useLocalMicrophoneTrack,
+  usePublish,
+  useRTCClient,
+  useRemoteAudioTracks,
+  useRemoteUsers,
 } from "agora-rtc-react";
 import { employeeAuth } from "../../../firebase.config";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -22,11 +32,7 @@ import KeyboardVoiceIcon from "@mui/icons-material/KeyboardVoice";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 
 import VideocamIcon from "@mui/icons-material/Videocam";
-import Messaging from "./Messaging";
-const config = {
-  mode: "rtc",
-  codec: "vp8",
-};
+
 const appId = "78de4173294f407d9d8312ee1a8ba1bd";
 
 const EmployeeSession = () => {
@@ -40,19 +46,26 @@ const EmployeeSession = () => {
   const [rejoin, setRejoin] = useState(false);
 
   const token = null;
+  const config = {
+    mode: "rtc",
+    codec: "vp8",
+  };
+  const agoraClient = useRTCClient(AgoraRTC.createClient(config));
   return (
     <div>
       {inCall ? (
-        <VideoCall
-          setInCall={setInCall}
-          channelName={channelName}
-          inCall={inCall}
-          session={session}
-          email={user?.email}
-          setRejoin={setRejoin}
-          appId={appId}
-          token={token}
-        ></VideoCall>
+        <AgoraRTCProvider client={agoraClient}>
+          <VideoCall
+            setInCall={setInCall}
+            channelName={channelName}
+            inCall={inCall}
+            session={session}
+            email={user?.email}
+            setRejoin={setRejoin}
+            appId={appId}
+            token={token}
+          ></VideoCall>
+        </AgoraRTCProvider>
       ) : (
         <ChannelForm
           setInCall={setInCall}
@@ -69,284 +82,90 @@ const EmployeeSession = () => {
   );
 };
 // video call component
-const useClient = createClient(config);
-const useMicrophoneAndCameraTracks = createMicrophoneAndCameraTracks();
+
 const VideoCall = (props) => {
-  const { setInCall, channelName, inCall, email, session, appId, token } =
-    props;
-  const [users, setUsers] = useState([]);
-  const [start, setStart] = useState(false);
-  const [showMessage, setShowMessage] = useState(false);
-  const navigate = useNavigate("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { appId, channelName } = props;
+  // const agoraEngine = useRTCClient( AgoraRTC.createClient({ codec: "vp8", mode: "rtc" })); // Initialize Agora Client
+  //pull the channel name from the param
 
-  const [remoteuserVideo, setRemoteUserVideo] = useState(false);
-  const [remoteuserAudio, setRemoteUserAudio] = useState(true);
+  // set the connection state
+  const [activeConnection, setActiveConnection] = useState(true);
 
-  const [msgForVideo, setMsgForVideo] = useState("");
-  const [msgForAudio, setMsgForAudio] = useState("");
+  // track the mic/video state - Turn on Mic and Camera On
+  const [micOn, setMic] = useState(true);
+  const [cameraOn, setCamera] = useState(true);
 
-  // using the hook to get access to the client object
-  const client = useClient();
+  // get local video and mic tracks
+  const { localMicrophoneTrack } = useLocalMicrophoneTrack(micOn);
+  const { localCameraTrack } = useLocalCameraTrack(cameraOn);
 
-  // ready is a state variable, which returns true when the local tracks are initialized, untill then tracks variable is null
-  const { ready, tracks } = useMicrophoneAndCameraTracks();
+  // to leave the call
+  const navigate = useNavigate();
 
-  const handleShow = () => {
-    setShowMessage(!showMessage);
-  };
-  useEffect(() => {
-    // function to initialise the SDK
-    let init = async (name) => {
-      setIsLoading(true);
-
-      console.log("users", users);
-
-      client.on("user-published", async (user, mediaType) => {
-        if (users.length < 1) {
-          await client.subscribe(user, mediaType);
-          if (mediaType === "video") {
-            setUsers((prevUsers) => {
-              return [...prevUsers, user];
-            });
-          }
-          if (mediaType === "audio") {
-            user.audioTrack?.play();
-          }
-        }
-      });
-
-      client.on("user-unpublished", (user, type) => {
-        if (type === "audio") {
-          user.audioTrack?.stop();
-        }
-        if (type === "video") {
-          setUsers((prevUsers) => {
-            return prevUsers.filter((User) => User.uid !== user.uid);
-          });
-        }
-      });
-
-      client.on("user-left", (user) => {
-        setUsers((prevUsers) => {
-          return prevUsers.filter((User) => User.uid !== user.uid);
-        });
-        // client.leave();
-        // client.removeAllListeners();
-
-        // we close the tracks to perform cleanup
-        // tracks[0].close();
-        // tracks[1].close();
-        // setRejoin(true);
-        // navigate(`/Dashboard/review/${session._id}`);
-      });
-
-      await client.join(appId, name, token, null);
-
-      // await client.
-      // tracks[1].setEnabled(false)
-      if (tracks) await client.publish([tracks[0], tracks[1]]);
-      setIsLoading(false);
-      setStart(true);
-    };
-
-    if (ready && tracks) {
-      init(channelName);
-    }
-  }, [channelName, client, ready, tracks]);
-  return isLoading ? (
-    <div className={classes.video_container_double_blank}></div>
-  ) : (
-    <div className={classes.video_container_double}>
-      {start && tracks && (
-        <Videos
-          remoteuserAudio={remoteuserAudio}
-          remoteuserVideo={remoteuserVideo}
-          users={users}
-          tracks={tracks}
-          showMessage={showMessage}
-          totalUser={client?._users}
-        />
-      )}
-      {ready && tracks && (
-        <Controls
-          setMsgForAudio={setMsgForAudio}
-          setMsgForVideo={setMsgForVideo}
-          msgForVideo={msgForVideo}
-          tracks={tracks}
-          users={users}
-          setStart={setStart}
-          setInCall={setInCall}
-          setShowMessage={handleShow}
-          showMessage={showMessage}
-          session={session}
-          setUsers={setUsers}
-        />
-      )}
-      {/*    {start && tracks && (
-        <Messaging
-          setRemoteUserAudio={setRemoteUserAudio}
-          setRemoteUserVideo={setRemoteUserVideo}
-          setMsgForVideo={setMsgForVideo}
-          msgForVideo={msgForVideo}
-          channelName={channelName}
-          users={users}
-          inCall={inCall}
-          email={email}
-          showMessage={showMessage}
-        />
-      )} */}
-    </div>
+  // Join the channel
+  useJoin(
+    {
+      appid: appId,
+      channel: channelName,
+      token: null,
+    },
+    activeConnection
   );
-};
 
-const Videos = (props) => {
-  const { totalUser, users, tracks, showMessage } = props;
-  let remoteUi = null;
+  usePublish([localMicrophoneTrack, localCameraTrack]);
 
-  console.log("tracks", tracks);
+  //remote users
+  const remoteUsers = useRemoteUsers();
+  const { audioTracks } = useRemoteAudioTracks(remoteUsers);
 
-  if (totalUser?.length <= 0) {
-    remoteUi = <div className={classes.vid}>No one joined yet</div>;
-  } else if (totalUser?.length > 0 && users.length > 0) {
-    remoteUi = (
-      <AgoraVideoPlayer
-        className={classes.vid}
-        videoTrack={users[0]?.videoTrack}
-        key={users[0]?.uid}
-      />
-    );
-  } else if (totalUser?.length > 0 && users.length <= 0) {
-    remoteUi = (
-      <div className={classes.vid}>
-        <PersonIcon style={{ width: "100px", height: "100px" }} />
-      </div>
-    );
-  }
-  return (
-    <div className={!showMessage ? classes.relative : classes.relative_two}>
-      <Grid id="videos" className={classes.videos} spacing={3} container>
-        <Grid
-          className={classes.video}
-          justifyContent="center"
-          item
-          md={12}
-          xs={12}
-        >
-          {remoteUi}
-        </Grid>
-      </Grid>
-      <div className={classes.patient}>
-        <AgoraVideoPlayer className={classes.myself} videoTrack={tracks[1]} />
-      </div>
-    </div>
-  );
-};
-
-export const Controls = (props) => {
-  const client = useClient();
-  const {
-    tracks,
-    users,
-    setStart,
-    setInCall,
-    setShowMessage,
-    showMessage,
-    session,
-    setMsgForVideo,
-    msgForVideo,
-    setMsgForAudio,
-    setUsers,
-  } = props;
-  const [trackState, setTrackState] = useState({ video: false, audio: true });
-  const navigate = useNavigate("");
-
-  const mute = async (type) => {
-    if (type === "audio") {
-      await tracks[0].setEnabled(!trackState.audio);
-      if (trackState.audio) {
-        setMsgForAudio("PERMISSION_AUDIO_DISABLE");
-      }
-      if (!trackState.video) {
-        setMsgForAudio("PERMISSION_AUDIO_ENABLE");
-      }
-      setTrackState((ps) => {
-        return { ...ps, audio: !ps.audio };
-      });
-    } else if (type === "video") {
-      await tracks[1].setEnabled(!trackState.video);
-      // tracks[1].video.disable = false;
-
-      if (trackState.video) {
-        setMsgForVideo("PERMISSION_VIDEO_DISABLE");
-      }
-      if (!trackState.video) {
-        setMsgForVideo("PERMISSION_VIDEO_ENABLE");
-      }
-      setTrackState((ps) => {
-        return { ...ps, video: !ps.video };
-      });
-    }
-  };
-
-  useEffect(() => {
-    mute("video");
-    // if (tracks[1]?._id) {
-    // tracks[1].setEnabled(!trackState.video)
-    // setTrackState({ video: false, audio: true })
-    // }
-  }, []);
-
-  const leaveChannel = async () => {
-    await client.leave();
-    client.removeAllListeners();
-
-    // we close the tracks to perform cleanup
-    tracks[0].close();
-    tracks[1].close();
-    setTrackState({ video: false, audio: false });
-    setStart(false);
-    setInCall(false);
-    window.location.reload();
-
-    // navigate(`/Dashboard/review/${session._id}`);
-  };
+  // play the remote user audio tracks
+  audioTracks.forEach((track) => track.play());
 
   return (
     <>
-      <div style={{ margin: "0", padding: "0", display: "none" }}>
-        {/* <Header /> */}
-      </div>
-
-      <div className={classes.controls}>
-        <p
-          className={trackState.audio ? "on" : ""}
-          style={{ backgroundColor: !trackState.audio ? "#EA5044" : "" }}
-          onClick={() => mute("audio")}
-        >
-          {trackState.audio ? <KeyboardVoiceIcon /> : <MicOffIcon />}
-        </p>
-        <p
-          className={trackState.video ? "on" : ""}
-          style={{ backgroundColor: !trackState.video ? "#EA5044" : "" }}
-          onClick={() => mute("video")}
-        >
-          {trackState.video ? <VideocamIcon /> : <VideocamOffIcon />}
-        </p>
-        <p
-          onClick={setShowMessage}
-          style={{ backgroundColor: showMessage ? "#31C75A" : "" }}
-        >
-          {showMessage ? <ModeCommentIcon /> : <ChatIcon />}
-        </p>
+      <div id="remoteVideoGrid">
         {
-          <p
-            onClick={() => leaveChannel()}
-            style={{ backgroundColor: "#EA5044" }}
-          >
-            <CallEndIcon />
-          </p>
+          // Initialize each remote stream using RemoteUser component
+          remoteUsers.map((user) => (
+            <div key={user.uid} className="remote-video-container">
+              <RemoteUser user={user} />
+            </div>
+          ))
         }
+      </div>
+      <div id="localVideo">
+        <LocalUser
+          audioTrack={localMicrophoneTrack}
+          videoTrack={localCameraTrack}
+          cameraOn={cameraOn}
+          micOn={micOn}
+          playAudio={micOn}
+          playVideo={cameraOn}
+          className=""
+        />
+        <div>
+          {/* media-controls toolbar component - UI controling mic, camera, & connection state  */}
+          <div id="controlsToolbar">
+            <div id="mediaControls">
+              <button className="btn" onClick={() => setMic((a) => !a)}>
+                Mic
+              </button>
+              <button className="btn" onClick={() => setCamera((a) => !a)}>
+                Camera
+              </button>
+            </div>
+            <button
+              id="endConnection"
+              onClick={() => {
+                setActiveConnection(false);
+                navigate("/");
+              }}
+            >
+              {" "}
+              Disconnect
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );
@@ -405,7 +224,17 @@ const ChannelForm = (props) => {
   const time = now.getHours() + ":" + now.getMinutes();
 
   let currentTime = timeConverter(time);
-  console.log(currentTime);
+  // currentTime = "4:9 AM";
+
+  const splittedTime = currentTime.split(" ");
+  const meridian = currentTime.split(" ")[1];
+  let minutes = splittedTime[0].split(":")[1];
+  if (minutes < 10) {
+    minutes = "0" + minutes;
+    currentTime =
+      splittedTime[0].split(":")[0] + ":" + minutes + " " + meridian;
+    console.log(currentTime);
+  }
   const verifiedTime =
     startTimeBuffer(session?.startTime) <= currentTime &&
     session?.endTime >= currentTime;
