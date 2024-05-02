@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import AgoraRTC, {
   AgoraRTCProvider,
   AgoraVideoPlayer,
+  LocalAudioTrack,
   LocalUser,
   RemoteUser,
   createClient,
@@ -64,6 +65,7 @@ const EmployeeSession = () => {
             setRejoin={setRejoin}
             appId={appId}
             token={token}
+            agoraClient={agoraClient}
           ></VideoCall>
         </AgoraRTCProvider>
       ) : (
@@ -84,7 +86,7 @@ const EmployeeSession = () => {
 // video call component
 
 const VideoCall = (props) => {
-  const { appId, channelName } = props;
+  const { appId, channelName, agoraClient } = props;
   // const agoraEngine = useRTCClient( AgoraRTC.createClient({ codec: "vp8", mode: "rtc" })); // Initialize Agora Client
   //pull the channel name from the param
 
@@ -117,7 +119,7 @@ const VideoCall = (props) => {
   //remote users
   const remoteUsers = useRemoteUsers();
   const { audioTracks } = useRemoteAudioTracks(remoteUsers);
-
+  console.log(remoteUsers);
   // play the remote user audio tracks
   audioTracks.forEach((track) => track.play());
 
@@ -126,28 +128,41 @@ const VideoCall = (props) => {
       <div id="remoteVideoGrid">
         {
           // Initialize each remote stream using RemoteUser component
-          remoteUsers.map((user) => (
-            <div key={user.uid} className="remote-video-container">
-              <RemoteUser user={user} />
-            </div>
-          ))
+          remoteUsers?.length > 0 ? (
+            remoteUsers.map((user) => (
+              <div
+                key={user.uid}
+                className="remote-video-container"
+                style={{ width: "500px", height: "500px" }}
+              >
+                <RemoteUser user={user} />
+              </div>
+            ))
+          ) : (
+            <p>No user joined yet</p>
+          )
         }
       </div>
-      <div id="localVideo">
+      <div id="localVideo" style={{ height: "500px", width: "500px" }}>
         <LocalUser
           audioTrack={localMicrophoneTrack}
           videoTrack={localCameraTrack}
           cameraOn={cameraOn}
           micOn={micOn}
-          playAudio={micOn}
+          playAudio={false}
           playVideo={cameraOn}
-          className=""
+          style={{ height: "500px", width: "500px" }}
         />
         <div>
           {/* media-controls toolbar component - UI controling mic, camera, & connection state  */}
           <div id="controlsToolbar">
             <div id="mediaControls">
-              <button className="btn" onClick={() => setMic((a) => !a)}>
+              <button
+                className="btn"
+                onClick={() => {
+                  setMic(!micOn);
+                }}
+              >
                 Mic
               </button>
               <button className="btn" onClick={() => setCamera((a) => !a)}>
@@ -158,10 +173,9 @@ const VideoCall = (props) => {
               id="endConnection"
               onClick={() => {
                 setActiveConnection(false);
-                navigate("/");
+                navigate("/employee-dashboard/session/");
               }}
             >
-              {" "}
               Disconnect
             </button>
           </div>
