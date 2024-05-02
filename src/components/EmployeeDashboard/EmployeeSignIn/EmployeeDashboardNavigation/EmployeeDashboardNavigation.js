@@ -29,6 +29,7 @@ const EmployeeDashboardNavigation = () => {
         >
           <Link to="/employee-dashboard/create-slot">Create Slots</Link>
           <Link to="/employee-dashboard/create-user">Create User</Link>
+          <Link to="/employee-dashboard/list-users">All Users</Link>
           <Link to="/employee-dashboard/session">Session with clients</Link>
           <Link to="/employee-dashboard/chat">Chat</Link>
           <Button

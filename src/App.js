@@ -24,6 +24,8 @@ import ChatDashBoardEmployee from "./components/ChatDashboardEmployee/ChatDashbo
 import ChatEmployee from "./components/Chat/ChatEmployee.js";
 import EmployeeSession from "./components/EmployeeDashboard/EmployeeSession/EmployeeSession.js";
 import EmployeeSessionList from "./components/EmployeeDashboard/EmployeeSessionList/EmployeeSessionList.js";
+import ListUsers from "./components/EmployeeDashboard/ListUsers/ListUsers.js";
+import EditUsers from "./components/EmployeeDashboard/EditUsers/EditUsers.js";
 function App() {
   return (
     <div>
@@ -48,6 +50,22 @@ function App() {
             element={
               <EmployeeRequireAuth>
                 <EmployeeCreateSlots />
+              </EmployeeRequireAuth>
+            }
+          />
+          <Route
+            path="list-users"
+            element={
+              <EmployeeRequireAuth>
+                <ListUsers />
+              </EmployeeRequireAuth>
+            }
+          />
+          <Route
+            path="list-users/:uid"
+            element={
+              <EmployeeRequireAuth>
+                <EditUsers />
               </EmployeeRequireAuth>
             }
           />

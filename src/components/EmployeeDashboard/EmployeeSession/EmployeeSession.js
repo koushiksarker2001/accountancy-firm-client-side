@@ -185,16 +185,14 @@ const VideoCall = (props) => {
               {/*   <button className="btn" onClick={() => setCamera((a) => !a)}>
                 Camera
               </button> */}
+              <CallEndIcon
+                sx={{ color: "red" }}
+                onClick={() => {
+                  setActiveConnection(false);
+                  navigate("/employee-dashboard/session/");
+                }}
+              />
             </div>
-            <button
-              id="endConnection"
-              onClick={() => {
-                setActiveConnection(false);
-                navigate("/employee-dashboard/session/");
-              }}
-            >
-              Disconnect
-            </button>
           </div>
         </div>
       </div>

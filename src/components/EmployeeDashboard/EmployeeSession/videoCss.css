@@ -41,7 +41,7 @@ body {
 
 #controlsToolbar {
   bottom: 35px;
-  right: 35px;
+  right: 230px;
   position: fixed;
   z-index: 99;
 }
