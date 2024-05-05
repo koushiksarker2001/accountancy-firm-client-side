@@ -26,6 +26,12 @@ import EmployeeSession from "./components/EmployeeDashboard/EmployeeSession/Empl
 import EmployeeSessionList from "./components/EmployeeDashboard/EmployeeSessionList/EmployeeSessionList.js";
 import ListUsers from "./components/EmployeeDashboard/ListUsers/ListUsers.js";
 import EditUsers from "./components/EmployeeDashboard/EditUsers/EditUsers.js";
+import CreateCompany from "./components/EmployeeDashboard/CreateCompany/CreateCompany.js";
+import CompanyList from "./components/EmployeeDashboard/CompanyList/CompanyList.js";
+import AssignTask from "./components/AdminDashboard/AdminAssignTask/AssignTask.js";
+import AssignedTask from "./components/EmployeeDashboard/AssignedTask/AssignedTask.js";
+import AdminTaskStatus from "./components/AdminDashboard/AdminTaskStatus/AdminTaskStatus.js";
+import AdminStatistics from "./components/AdminStatistics/AdminStatistics.js";
 function App() {
   return (
     <div>
@@ -50,6 +56,30 @@ function App() {
             element={
               <EmployeeRequireAuth>
                 <EmployeeCreateSlots />
+              </EmployeeRequireAuth>
+            }
+          />
+          <Route
+            path="assigned-task"
+            element={
+              <EmployeeRequireAuth>
+                <AssignedTask />
+              </EmployeeRequireAuth>
+            }
+          />
+          <Route
+            path="create-company"
+            element={
+              <EmployeeRequireAuth>
+                <CreateCompany />
+              </EmployeeRequireAuth>
+            }
+          />
+          <Route
+            path="company-list"
+            element={
+              <EmployeeRequireAuth>
+                <CompanyList />
               </EmployeeRequireAuth>
             }
           />
@@ -166,6 +196,30 @@ function App() {
             element={
               <AdminRequireAuth>
                 <AdminCreateEmployee></AdminCreateEmployee>
+              </AdminRequireAuth>
+            }
+          />
+          <Route
+            path="create-task"
+            element={
+              <AdminRequireAuth>
+                <AssignTask />
+              </AdminRequireAuth>
+            }
+          />
+          <Route
+            path="task-status"
+            element={
+              <AdminRequireAuth>
+                <AdminTaskStatus />
+              </AdminRequireAuth>
+            }
+          />
+          <Route
+            path="statistics"
+            element={
+              <AdminRequireAuth>
+                <AdminStatistics />
               </AdminRequireAuth>
             }
           />

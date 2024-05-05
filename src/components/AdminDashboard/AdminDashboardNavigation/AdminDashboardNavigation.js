@@ -27,6 +27,9 @@ const AdminDashboardNavigation = () => {
           }}
         >
           <Link to="/admin-dashboard/create-employee">Create employee</Link>
+          <Link to="/admin-dashboard/create-task">Assign Task</Link>
+          <Link to="/admin-dashboard/task-status">Task Status</Link>
+          <Link to="/admin-dashboard/statistics">Statistics</Link>
           <Button
             onClick={async () => {
               await signOut();

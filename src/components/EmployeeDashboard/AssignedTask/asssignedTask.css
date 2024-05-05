@@ -1,0 +1,14 @@
+.completed-task {
+  cursor: pointer;
+  pointer-events: all;
+}
+.completed-task:hover {
+  color: green !important;
+}
+.postponed-task {
+  cursor: pointer;
+  pointer-events: all;
+}
+.postponed-task:hover {
+  color: red !important;
+}
