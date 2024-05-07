@@ -28,6 +28,7 @@ const PublicUserDashboardNavigation = () => {
         >
           <Link to="/user-dashboard/upload-file">Upload Files</Link>
           <Link to="/user-dashboard/chat">Chat with employee</Link>
+          <Link to="/user-dashboard/company-list">Company List</Link>
           {/* <Link to="/user-dashboard/upload-file">Upload Files</Link> */}
           {/* <Link to="/employee-dashboard/create-user">Create User</Link> */}
           <Button

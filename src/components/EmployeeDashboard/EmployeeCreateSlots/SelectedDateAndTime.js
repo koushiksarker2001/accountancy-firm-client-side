@@ -7,7 +7,7 @@ export default function SelectedDateAndTime({ details, handleDelete }) {
   return (
     <Grid
       item
-      md={6}
+      md={4}
       className="scroollbar"
       style={{ maxHeight: "450px", width: "100%", overflowY: "scroll" }}
     >

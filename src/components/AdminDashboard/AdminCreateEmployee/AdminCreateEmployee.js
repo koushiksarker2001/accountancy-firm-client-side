@@ -21,6 +21,7 @@ const AdminCreateEmployee = () => {
       await axios
         .post("http://localhost:8080/admin/employee", {
           email: email,
+          availableDateTimes: [],
         })
         .then((res) => console.log(res.data));
     }

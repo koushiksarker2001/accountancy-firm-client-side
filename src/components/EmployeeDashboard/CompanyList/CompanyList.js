@@ -39,6 +39,7 @@ function createData(
   annualReturnDone,
   annualReturnDue,
   assign,
+  companyId,
   action
 ) {
   return {
@@ -50,6 +51,7 @@ function createData(
     annualReturnDone,
     annualReturnDue,
     assign,
+    companyId,
     action,
   };
 }
@@ -67,6 +69,7 @@ const style = {
 const CompanyList = () => {
   const [company, setCompany] = useState([]);
   const [tempCompany, setTempCompany] = useState([]);
+  const [updateStatus, setUpdateStatus] = useState(false);
   const [sort, setSort] = useState("");
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -96,7 +99,7 @@ const CompanyList = () => {
         }
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [updateStatus]);
   const [rows, setRows] = useState([]);
   const [companySearch, setCompanySearch] = useState("");
   useEffect(() => {
@@ -115,7 +118,8 @@ const CompanyList = () => {
           company?.annualAccountsDue,
           company?.annualReturnDone,
           company?.annualReturnDue,
-          company?.assign
+          company?.assign,
+          company?._id
         )
       );
       setRows(companyRows);
@@ -134,7 +138,8 @@ const CompanyList = () => {
           company?.annualAccountsDue,
           company?.annualReturnDone,
           company?.annualReturnDue,
-          company?.assign
+          company?.assign,
+          company?._id
         )
       );
       setRows(companyRows);
@@ -153,7 +158,8 @@ const CompanyList = () => {
           company?.annualAccountsDue,
           company?.annualReturnDone,
           company?.annualReturnDue,
-          company?.assign
+          company?.assign,
+          company?._id
         )
       );
       setRows(companyRows);
@@ -172,7 +178,8 @@ const CompanyList = () => {
           company?.annualAccountsDue,
           company?.annualReturnDone,
           company?.annualReturnDue,
-          company?.assign
+          company?.assign,
+          company?._id
         )
       );
       setRows(companyRows);
@@ -186,7 +193,8 @@ const CompanyList = () => {
           company?.annualAccountsDue,
           company?.annualReturnDone,
           company?.annualReturnDue,
-          company?.assign
+          company?.assign,
+          company?._id
         )
       );
       setRows(companyRows);
@@ -220,7 +228,8 @@ const CompanyList = () => {
     saveAs(data, "table.xlsx");
   };
   // const [companyReturnDue, setCompanyReturnDue] = useState([]);
-  const handleUpdate = (e) => {
+  const [id, setId] = useState("");
+  const handleUpdate = async (e) => {
     e.preventDefault();
 
     const annualAccountsDone = DateTime.fromISO(
@@ -235,14 +244,21 @@ const CompanyList = () => {
     const annualReturnDue = DateTime.fromISO(
       new Date(annualReturnDueModal).toISOString()
     ).toString();
-
-    console.log(
-      annualAccountsDone,
-      annualAccountsDue,
-      annualReturnDone,
-      annualReturnDueModal
-    );
+    await axios
+      .put("http://localhost:8080/company-update", {
+        id: id,
+        annualAccountsDone: annualAccountsDone,
+        annualAccountsDue: annualAccountsDue,
+        annualReturnDone: annualReturnDone,
+        annualReturnDue: annualReturnDue,
+      })
+      .then(
+        (data) => data.data == "Successful" && setUpdateStatus(!updateStatus)
+      )
+      .catch((err) => console.log(err));
+    handleClose();
   };
+
   return (
     <div>
       <Button onClick={handleExportToExcel}>Export as excel</Button>
@@ -316,6 +332,7 @@ const CompanyList = () => {
                       setAnnualAccountsDueModal(row?.annualAccountsDue);
                       setAnnualReturnDoneModal(row?.annualReturnDone);
                       setAnnualReturnDueModal(row?.annualReturnDue);
+                      setId(row?.companyId);
                     }}
                   >
                     <TableCell align="right">Update</TableCell>

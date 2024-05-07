@@ -31,7 +31,8 @@ import CompanyList from "./components/EmployeeDashboard/CompanyList/CompanyList.
 import AssignTask from "./components/AdminDashboard/AdminAssignTask/AssignTask.js";
 import AssignedTask from "./components/EmployeeDashboard/AssignedTask/AssignedTask.js";
 import AdminTaskStatus from "./components/AdminDashboard/AdminTaskStatus/AdminTaskStatus.js";
-import AdminStatistics from "./components/AdminStatistics/AdminStatistics.js";
+import AdminStatistics from "./components/AdminDashboard/AdminStatistics/AdminStatistics.js";
+import PublicUserCompany from "./components/PublicUserDashboard/PublicUserCompany/PublicUserCompany.js";
 function App() {
   return (
     <div>
@@ -158,6 +159,14 @@ function App() {
             element={
               <PublicUserRequireAuth>
                 <PublicUserUploadFile />
+              </PublicUserRequireAuth>
+            }
+          />
+          <Route
+            path="company-list"
+            element={
+              <PublicUserRequireAuth>
+                <PublicUserCompany />
               </PublicUserRequireAuth>
             }
           />

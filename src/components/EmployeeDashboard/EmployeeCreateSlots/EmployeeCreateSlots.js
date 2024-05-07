@@ -9,6 +9,11 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
@@ -16,6 +21,8 @@ import SelectedDateAndTime from "./SelectedDateAndTime";
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import { employeeAuth } from "../../../firebase.config";
+import axios from "axios";
+import { Delete } from "@mui/icons-material";
 
 const boxStyle = {
   padding: "2rem",
@@ -24,11 +31,14 @@ const boxStyle = {
     padding: "0rem",
   },
 };
-
+function createData(day, startTime, endTime, index) {
+  return { day, startTime, endTime, index };
+}
 const EmployeeCreateSlots = ({}) => {
   const [details, setDetails] = useState({
     availableDateTimes: [],
   });
+
   let [dates, setDates] = useState([]);
   let [timeObj, setTimeObj] = useState({
     startTime: "",
@@ -46,7 +56,7 @@ const EmployeeCreateSlots = ({}) => {
       timeObj.startTime !== "" &&
       timeObj.endTime !== ""
     ) {
-      let filteredDates = dates.filter((date) => date.date == selectedDate);
+      let filteredDates = dates?.filter((date) => date.date == selectedDate);
       console.log(filteredDates);
       if (filteredDates.length) {
         filteredDates[0].times.push(timeObj);
@@ -114,16 +124,20 @@ const EmployeeCreateSlots = ({}) => {
     let end = hours.toString().concat(":", minutes, " ", timeZone);
     return end;
   };
+  const [successStatus, setSuccessStatus] = useState(false);
 
-  const handleDelete = (date, time) => {
-    let selectedArr = details.availableDateTimes.filter(
-      (dateTimes) => dateTimes.date === date
-    );
-    let filteredDate = selectedArr[0].times.filter((obj) => obj !== time);
-
-    let filteredDateObj = dates.filter((data) => data.date == date);
-    filteredDateObj[0].times = filteredDate;
-    setDates([...dates]);
+  // delete slots
+  const handleDelete = (index, date, indexDate) => {
+    axios
+      .put("http://localhost:8080/employee-slot-update", {
+        email: user?.email,
+        indexDate: indexDate,
+        index: index,
+      })
+      .then(
+        (data) => data.data == "Successful" && setSuccessStatus(!successStatus)
+      )
+      .catch((err) => console.log(err));
   };
 
   const today = new Date().toISOString().slice(0, 10);
@@ -146,11 +160,12 @@ const EmployeeCreateSlots = ({}) => {
       },
     });
     const json = await response.json();
+    console.log(json);
 
-    if (!response.ok) {
+    if (json!=='Successful') {
       alert("Something Went Wrong");
     }
-    if (response.ok) {
+    if (json=='Successful') {
       // setError(null);
       // setSuccess("Session boked successfully");
       setDetails({
@@ -167,6 +182,25 @@ const EmployeeCreateSlots = ({}) => {
       // navigate("/psychologist-dashboard");
     }
   };
+  const [employee, setEmployee] = useState([]);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:8080/employee/find-by/${user?.email}`)
+      .then((data) => setEmployee(data.data.availableDateTimes))
+      .catch((err) => console.log(err));
+  }, [details, user, successStatus]);
+  const [rows, setRows] = useState([]);
+  useEffect(() => {
+    const availableDateTimeRows = employee?.map((employee, index) =>
+      createData(
+        employee?.date,
+        employee?.times[0]?.startTime,
+        employee?.times[0]?.endTime,
+        index
+      )
+    );
+    setRows(availableDateTimeRows);
+  }, [employee, successStatus]);
 
   return (
     <Box>
@@ -176,8 +210,13 @@ const EmployeeCreateSlots = ({}) => {
         }}
       >
         <Box style={boxStyle}>
-          <Grid container spacing={4}>
-            <Grid item md={6} style={{ width: "100%" }}>
+          <Grid
+            columns={{ md: 12 }}
+            container
+            sx={{ width: "900px" }}
+            spacing={4}
+          >
+            <Grid item md={4} style={{ width: "100%" }}>
               <Box style={{ background: "#F5F5F5", padding: "2rem" }}>
                 <Typography variant="h4" style={{ textAlign: "center" }}>
                   Date Selector
@@ -325,6 +364,88 @@ const EmployeeCreateSlots = ({}) => {
               details={details}
               handleDelete={handleDelete}
             />
+            <Grid item md={4}>
+              <Box style={{ background: "#F5F5F5", padding: "2rem" }}>
+                <Typography
+                  variant="h4"
+                  style={{ textAlign: "center" }}
+                  sx={{
+                    fontSize: {
+                      xs: "5vw",
+                      sm: "3vw",
+                      md: "2vw",
+                    },
+                  }}
+                >
+                  Schedule
+                </Typography>
+
+                {employee?.length
+                  ? employee?.map((dateTimes, indexDate) =>
+                      dateTimes?.date && dateTimes?.times?.length ? (
+                        <>
+                          <Box key={dateTimes.id}>
+                            <p>
+                              <span style={{ color: "#31C75A" }}>Day:</span>{" "}
+                              {dateTimes.date}
+                            </p>
+                            <Grid container>
+                              <Grid item xs={5}>
+                                <Typography>Start Time</Typography>
+                              </Grid>
+                              <Grid item xs={5}>
+                                <Typography>End Time</Typography>
+                              </Grid>
+                              <Grid item xs={2}>
+                                <Typography></Typography>
+                              </Grid>
+                            </Grid>
+                          </Box>
+                          <Box>
+                            <Grid container>
+                              {dateTimes.times.map((time, index) => (
+                                <>
+                                  <Grid item xs={5}>
+                                    <Typography>{time.startTime}</Typography>
+                                  </Grid>
+                                  <Grid item xs={5}>
+                                    <Typography>{time.endTime}</Typography>
+                                  </Grid>
+                                  <Grid item xs={2}>
+                                    <Delete
+                                      onClick={() =>
+                                        handleDelete(
+                                          index,
+                                          dateTimes.date,
+                                          indexDate
+                                        )
+                                      }
+                                    ></Delete>
+                                    {/* <img
+                                       onClick={() =>
+                                        handleDelete(dateTimes.date, time)
+                                      }
+                                      src={deleteIcon}
+                                      alt="deleteicon"
+                                      style={{
+                                        width: "1.5rem",
+                                        height: "1.5rem",
+                                        cursor: "pointer",
+                                      }}
+                                    /> */}
+                                  </Grid>
+                                </>
+                              ))}
+                            </Grid>
+                          </Box>
+                        </>
+                      ) : (
+                        ""
+                      )
+                    )
+                  : ""}
+              </Box>
+            </Grid>
           </Grid>
 
           {/* Submitting Button */}
