@@ -23,7 +23,7 @@ export default function SelectedDateAndTime({ details, handleDelete }) {
             },
           }}
         >
-          Schedule
+          Selected Schedule
         </Typography>
 
         {details?.availableDateTimes?.length

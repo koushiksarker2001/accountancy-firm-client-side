@@ -1,22 +1,26 @@
 import {
   Box,
+  CircularProgress,
   Container,
   CssBaseline,
   Typography,
   createTheme,
 } from "@mui/material";
+
 import React from "react";
 import getLPTheme from "../../LandingPage/getLPTheme";
 import { ThemeProvider } from "@emotion/react";
 import AppAppBar from "../../LandingPage/AppAppBar";
 import { useForm } from "react-hook-form";
 import "./employeeSignIn.css";
+import Footer from "../../LandingPage/Footer.js";
 import {
   useAuthState,
   useSignInWithEmailAndPassword,
 } from "react-firebase-hooks/auth";
 import { employeeAuth } from "../../../firebase.config";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 const EmployeeSignIn = () => {
   const [mode, setMode] = React.useState("dark");
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
@@ -40,14 +44,16 @@ const EmployeeSignIn = () => {
   if (loggedUser) {
     navigate(from, { replace: true });
   }
-  if (loggedLoading || loading) {
+  /* if (loggedLoading || loading) {
     return <p>Loading...</p>;
-  }
+  } */
   const onSubmit = async (data) => {
     const { email, password } = data;
     const response = await signInWithEmailAndPassword(email, password);
     if (response?.user?.email) {
       navigate(from, { replace: true });
+    } else {
+      toast.warn("Email/Password is not valid");
     }
   };
 
@@ -83,7 +89,7 @@ const EmployeeSignIn = () => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              background: "white",
+              background: ``,
               padding: "20px",
             }}
             onSubmit={handleSubmit(onSubmit)}
@@ -113,14 +119,19 @@ const EmployeeSignIn = () => {
               <span style={{ color: "red" }}>Password field is required</span>
             )}
 
-            <input
-              className="employee-input"
-              type="submit"
-              style={{ width: "80%" }}
-            />
+            {loggedLoading || loading ? (
+              <CircularProgress />
+            ) : (
+              <input
+                className="employee-input employee-input-button"
+                type="submit"
+                style={{ width: "80%" }}
+              />
+            )}
           </form>
         </Container>
       </Box>
+      <Footer />
     </ThemeProvider>
   );
 };

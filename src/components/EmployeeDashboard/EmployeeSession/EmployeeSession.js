@@ -209,7 +209,7 @@ const ChannelForm = (props) => {
   //time converter to meridian
   const timeConverter = (time) => {
     let hours = time.split(":")[0];
-    console.log(hours);
+
     let meridian;
     if (hours > 12) {
       meridian = "PM";
@@ -304,6 +304,7 @@ const ChannelForm = (props) => {
   const verified = session?.date === today;
   console.log(verifiedTime);
   const verifiedPassed = session?.date < today;
+  console.log(verifiedPassed);
   // console.log(verified, verifiedPassed);
   // console.log(today);
   /* useEffect(() => {

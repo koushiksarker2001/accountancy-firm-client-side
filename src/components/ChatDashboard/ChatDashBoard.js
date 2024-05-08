@@ -12,11 +12,29 @@ const ChatDashBoard = () => {
       .catch((err) => console.log(err));
   }, []);
   return (
-    <div>
+    <div className="all_employee">
       {employee?.map((employee) => (
-        <div key={employee?.email}>
-          <Typography>{employee?.email}</Typography>
-          <Link to={`/user-dashboard/chat/${employee?._id}`} >Chat</Link>
+        <div key={employee?.email} className="group-37417">
+          <div
+            className="rectangle-59"
+            style={{
+              padding: "0px",
+              height: "100%",
+            }}
+          >
+            <div>
+              <p className="employee-name">{employee?.email}</p>
+            </div>
+
+            <Link
+              to={`/user-dashboard/chat/${employee?._id}`}
+              style={{ textDecoration: "none", color: "black" }}
+            >
+              <div className="group-btn">
+                <div className="booking-button-custom">Chat</div>
+              </div>
+            </Link>
+          </div>
         </div>
       ))}
     </div>

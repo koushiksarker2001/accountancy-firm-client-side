@@ -80,8 +80,8 @@ export default function Services() {
           pt: { xs: 4, sm: 12 },
           pb: { xs: 8, sm: 16 },
           color: "white",
-          bgcolor: "#06090a",
-          marginTop: "50px",
+          bgcolor: "background.default",
+          // marginTop: "50px",
         }}
       >
         <Container
@@ -99,7 +99,11 @@ export default function Services() {
               textAlign: { sm: "left", md: "center" },
             }}
           >
-            <Typography component="h2" variant="h4">
+            <Typography
+              component="h2"
+              variant="h4"
+              style={{ color: `${mode == "light" && "black"}` }}
+            >
               Services
             </Typography>
             <Typography variant="body1" sx={{ color: "grey.400" }}>
@@ -124,12 +128,23 @@ export default function Services() {
                     border: "1px solid",
                     borderColor: "grey.800",
                     background: "transparent",
-                    backgroundColor: "grey.900",
+                    backgroundColor: `${mode == "light" && "white"}`,
                   }}
                 >
-                  <Box sx={{ opacity: "50%" }}>{item.icon}</Box>
+                  <Box
+                    sx={{
+                      opacity: "50%",
+                      color: `${mode == "light" && "black"}`,
+                    }}
+                  >
+                    {item.icon}
+                  </Box>
                   <div>
-                    <Typography fontWeight="medium" gutterBottom>
+                    <Typography
+                      fontWeight="medium"
+                      gutterBottom
+                      style={{ color: `${mode == "light" && "black"}` }}
+                    >
                       {item.title}
                     </Typography>
                     <Typography variant="body2" sx={{ color: "grey.400" }}>

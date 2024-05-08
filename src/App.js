@@ -33,6 +33,8 @@ import AssignedTask from "./components/EmployeeDashboard/AssignedTask/AssignedTa
 import AdminTaskStatus from "./components/AdminDashboard/AdminTaskStatus/AdminTaskStatus.js";
 import AdminStatistics from "./components/AdminDashboard/AdminStatistics/AdminStatistics.js";
 import PublicUserCompany from "./components/PublicUserDashboard/PublicUserCompany/PublicUserCompany.js";
+import PublicUserSessionList from "./components/PublicUserDashboard/PublicUserSessionList/PublicUserSessionList.js";
+import UploadedFiles from "./components/PublicUserDashboard/UploadedFiles/UploadedFiles.js";
 function App() {
   return (
     <div>
@@ -159,6 +161,30 @@ function App() {
             element={
               <PublicUserRequireAuth>
                 <PublicUserUploadFile />
+              </PublicUserRequireAuth>
+            }
+          />
+          <Route
+            path="uploaded-files"
+            element={
+              <PublicUserRequireAuth>
+                <UploadedFiles />
+              </PublicUserRequireAuth>
+            }
+          />
+          <Route
+            path="session"
+            element={
+              <PublicUserRequireAuth>
+                <PublicUserSessionList />
+              </PublicUserRequireAuth>
+            }
+          />
+          <Route
+            path="session/:id"
+            element={
+              <PublicUserRequireAuth>
+                <EmployeeSession />
               </PublicUserRequireAuth>
             }
           />

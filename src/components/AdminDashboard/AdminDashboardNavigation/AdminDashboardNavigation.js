@@ -15,6 +15,7 @@ const AdminDashboardNavigation = () => {
           backgroundColor: "beige",
           height: "100vh",
           position: "fixed",
+          display: "flex",
         }}
       >
         <div

@@ -15,38 +15,32 @@ export default function PublicUserRequireAuth({ children }) {
       axios
         .get(`http://localhost:8080/public-user/${user?.email}`)
         .then((data) => {
-          console.log(data);
           if (data.data) {
             setIsUser(data.data);
           }
         })
         .catch((err) => {
           console.log(err);
-          setIsUser(false); // Set isAdmin to false if there's an error
+          setIsUser(false);
         });
     } else {
-      setIsUser(false); // Set isAdmin to false if there's no user
+      setIsUser(false);
     }
   }, [user]);
 
   if (loading) {
-    // You might want to render a loading spinner or some loading state
     return null;
   }
 
   if (isUser === null) {
-    // If isAdmin is still unknown, return null or loading state
     return null;
   }
 
   if (isUser) {
-    // Render the child components only if the user is an admin
     return children;
   } else if (user) {
-    // Redirect to admin login if the user is not an admin
     return <Navigate to="/user-login" state={{ from: location }} replace />;
   } else {
-    // Handle the case where the user is not authenticated
     return <Navigate to="/user-login" state={{ from: location }} replace />;
   }
 }

@@ -1,4 +1,14 @@
 .employee-input {
   padding: 20px;
   border-radius: 50px;
+
+  border: 0px;
+}
+.employee-input-button {
+  cursor: pointer;
+  background-color: #085bad;
+
+}
+.employee-input-button:hover {
+  background-color: #0b69c7;
 }

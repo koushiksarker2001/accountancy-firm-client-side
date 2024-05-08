@@ -14,6 +14,8 @@ import pdfFileImage from "../../assets/images/file-type/pdf file.png";
 import docFileImage from "../../assets/images/file-type/doc icon.png";
 import docxFileImage from "../../assets/images/file-type/docx icon.png";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   chatApp,
   publicUserAuth,
@@ -23,8 +25,9 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { LinearProgress, Typography } from "@mui/material";
+import { Button, LinearProgress, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
+import { Attachment, Message } from "@mui/icons-material";
 const db = getFirestore(chatApp);
 const Chat = () => {
   const [selectedFile, setSelectedFile] = useState();
@@ -151,6 +154,7 @@ const Chat = () => {
                 receiverEmail: employee?.email,
               });
               setSelectedFile(null);
+              toast("File sent");
               fileInputRef.current.value = "";
               setProgress(null);
             }
@@ -158,7 +162,13 @@ const Chat = () => {
         }
       );
     } else {
-      setError("File Size Can Not Exceed 100MB");
+      if (!selectedFile) {
+        setError("No file selected");
+        toast.warn("No file sent");
+      } else {
+        setError("File Size Can Not Exceed 100MB");
+        toast.error("File Size Can Not Exceed 100MB");
+      }
     }
   };
   const sendMessage = async () => {
@@ -179,36 +189,7 @@ const Chat = () => {
       <div className="flex justify-center bg-gray-800 py-10 min-h-screen">
         {user && (
           <div>
-            <div> Logged in as {user.email}</div>
-            {!selectedFile && (
-              <div>
-                <input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                />
-                <button
-                  className=" bg-white rounded-[10px] hover:bg-blue-400 p-3"
-                  onClick={sendMessage}
-                >
-                  Send Message
-                </button>
-              </div>
-            )}
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={(e) => {
-                const file = e.target.files ? e.target.files[0] : undefined;
-                setSelectedFile(file);
-              }}
-            />
-            <button onClick={handleUpload}>Upload file</button>
-            {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
-            {progress && (
-              <LinearProgress variant="determinate" value={progress} />
-            )}
-
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-5" style={{ padding: "0 15px" }}>
               {filteredMessages.map((msg) => (
                 <div
                   key={msg.id}
@@ -217,8 +198,8 @@ const Chat = () => {
                     justifyContent: `${
                       msg.data.email === user?.email ? "end" : "start"
                     }`,
-                    background: `${
-                      msg.data.email === user?.email ? "gray" : "blue"
+                    fontWeight: `${
+                      msg.data.email === user?.email ? "" : "700"
                     }`,
                     margin: "10px 0",
                   }}
@@ -288,9 +269,53 @@ const Chat = () => {
                 </div>
               ))}
             </div>
+
+            <div style={{ padding: "0 15px" }}>
+              {!selectedFile && (
+                <div>
+                  <input
+                    style={{ width: "85%", padding: "20px" }}
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                  />
+
+                  <Button
+                    // style={{ display: "flex", alignItems: "center" }}
+                    onClick={sendMessage}
+                  >
+                    <Message sx={{ fontSize: "30px" }} /> Send Message
+                  </Button>
+                </div>
+              )}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  margin: "10px 0",
+                  justifyContent: "center",
+                }}
+              >
+                <Attachment />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) => {
+                    const file = e.target.files ? e.target.files[0] : undefined;
+                    setSelectedFile(file);
+                  }}
+                />
+                <Button onClick={handleUpload}>Upload file</Button>
+              </div>
+
+              {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
+              {progress && (
+                <LinearProgress variant="determinate" value={progress} />
+              )}
+            </div>
           </div>
         )}
       </div>
+      <ToastContainer />
     </div>
   );
 };

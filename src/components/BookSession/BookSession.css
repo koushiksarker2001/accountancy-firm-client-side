@@ -1,18 +1,8 @@
-.SelectPsychotherapist {
+.SelectEmployee {
   margin-top: 8rem;
 }
 
-.ourPsychologist {
-  box-shadow: -1px 11px 68px -18px rgba(0, 0, 0, 0.74);
-  -webkit-box-shadow: -1px 11px 68px -18px rgba(0, 0, 0, 0.74);
-  -moz-box-shadow: -1px 11px 68px -18px rgba(0, 0, 0, 0.74);
-}
-
-/* .searching_container {
-      display: fle;
-  } */
-
-.psychologist-img {
+.employee-img {
   margin-top: 1rem;
   width: 15rem;
   height: 15rem !important;
@@ -57,23 +47,17 @@
 }
 
 .exp {
-  /* position: absolute;
-      bottom: 0;
-      right: 0; */
-  /* z-index: 10; */
-  /* background-color: rgb(49, 199, 90);
-      color: #fff; */
   margin: 5px;
   text-align: center;
 }
 
-.all_psychologist {
+.all_employee {
   display: grid;
   gap: 2rem;
   grid-template-columns: repeat(3, 1fr);
 }
 
-.psychologist_booking {
+.employee_booking {
   display: grid;
   gap: 2rem;
   grid-template-columns: 1fr 2fr 1fr 2fr;
@@ -87,13 +71,13 @@
 }
 
 @media screen and (max-width: 960px) {
-  .all_psychologist {
+  .all_employee {
     grid-template-columns: 1fr;
 
     justify-items: center;
   }
 
-  .psychologist_booking {
+  .employee_booking {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
@@ -125,7 +109,7 @@
   font-family: "DM Sans";
   src: url("https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,700&display=swap");
 }
-.psychologist-box {
+.employee-box {
   text-align: center;
   justify-content: center;
   padding: 5px 15px 15px 15px;
@@ -138,11 +122,11 @@
   border-radius: 10px;
 }
 
-.psychologist-container {
+.employee-container {
   padding: 38px;
 }
 
-.psychologist-img {
+.employee-img {
   margin-top: 1rem;
   width: 10rem !important;
   height: 10rem !important;
@@ -166,7 +150,7 @@
   border-radius: 25px !important;
 }
 
-.psychologist-name {
+.employee-name {
   font-family: "Poppins";
   font-size: 20px;
   font-weight: 700;
@@ -177,13 +161,13 @@
   margin-bottom: 0px;
 }
 
-.psychologist-title {
+.employee-title {
   font-size: 15px;
   font-weight: 500;
   margin: 5px;
 }
 
-.psychologist-recommend {
+.employee-recommend {
   color: green;
   font-size: 14px;
   font-weight: 500;
@@ -218,7 +202,7 @@
 }
 .group-37417 {
   width: 295px;
-  height: 440px;
+  height: 150px;
   margin: 15% 0;
 }
 
@@ -235,7 +219,7 @@
   transition-duration: 0.3s;
 }
 .rectangle-59:hover {
-  border: 8px solid #31c75a;
+  border: 8px solid #0080ff;
   transition: all;
   transition-duration: 0.5s;
 }
@@ -243,6 +227,59 @@
   position: relative;
   width: 151px;
   height: 151px;
+}
+.time-button-parent {
+  display: flex;
+  justify-content: center;
+}
+.time-button {
+  background: linear-gradient(0deg, #ffffff, #ffffff),
+    linear-gradient(0deg, #e3e8ef, #e3e8ef);
+  border: 1px solid #e3e8ef;
+  width: 214px;
+  height: 48px;
+  padding: 11px, 12px, 11px, 16px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  cursor: pointer;
+}
+.time-button button {
+  border: none;
+  background: linear-gradient(0deg, #ffffff, #ffffff),
+    linear-gradient(0deg, #e3e8ef, #e3e8ef);
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 26px;
+  letter-spacing: 0.005em;
+  text-align: left;
+  color: #677489;
+}
+.custom-box-parent {
+  display: flex;
+  justify-content: center;
+}
+.custom-box {
+  width: 211px;
+  height: 176px;
+  top: 938px;
+  left: 1008.77px;
+  padding: 8px, 0px, 8px, 0px;
+  border-radius: 8px;
+  background: white;
+
+  box-shadow: 0px 1px 3px 0px #130a2e21;
+
+  box-shadow: 0px 3px 14px 0px #130a2e08;
+
+  box-shadow: 0px 8px 32px 0px #130a2e12;
+
+  box-shadow: 0px 30px 84px 0px #130a2e14;
+}
+.select-time:hover {
+  background: #0080ff !important;
 }
 .image-60 {
   /*  width: 151px;
@@ -275,8 +312,8 @@
 }
 .booking-button-custom {
   width: 263px;
-  height: 62px;
-  background: #31c75a;
+  height: 20px;
+  background: #064583;
   padding: 10px;
   border-radius: 61px;
   margin: 0 5px;
@@ -308,26 +345,8 @@
 .booking-button-custom:hover p {
   color: #686868;
 }
-.review {
-  /* margin-bottom: ; */
-}
-.faded-text {
-  /* Set the same font size as sliced text */
-  font-family: "Poppins";
-  color: transparent; /* Make text color transparent */
-  background: linear-gradient(
-    to right,
-    rgb(0, 0, 0),
-    rgba(0, 0, 0, 0.8),
-    rgba(0, 0, 0, 0.6),
-    rgba(0, 0, 0, 0.4),
-    rgba(0, 0, 0, 0.2)
-  );
-  /* Add a gradient background to create the fade effect */
-  background-clip: text;
-}
 
-.psychologist-image-square {
+.employee-image-square {
   position: relative;
 }
 .verified-image {

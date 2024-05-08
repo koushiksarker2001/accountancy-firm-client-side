@@ -2,44 +2,35 @@ import TextField from "@mui/material/TextField";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { employeeAuth, publicUserAuth } from "../../firebase.config";
 import AppAppBar from "../LandingPage/AppAppBar";
+import Footer from "../LandingPage/Footer.js";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import "./BookSession.css";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
-
+import getLPTheme from "../LandingPage/getLPTheme.js";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import spinner from "../../assets/images/spinner-loop.gif";
 
 import style from "./styles.module.css";
-import { Box, Button, Container, FormControl, Rating } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  CssBaseline,
+  FormControl,
+  Rating,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
 import Grid from "@mui/material/Grid";
 import BookSessionForm from "./BookSessionForm";
 import { DateTime } from "luxon";
-
-/* const renderWeekPickerDay = (date, selectedDates, pickersDayProps) => {
-  return (
-    <PickersDay
-      {...pickersDayProps}
-      sx={{
-        [`&&.${pickersDayClasses.selected}`]: {
-          backgroundColor: "rgb(23, 216, 136)",
-          borderRadius: "50%",
-          border: "1px solid #fff",
-          color: "#fff !important",
-        },
-      }}
-    />
-  );
-}; */
-
-//   MuiButtonBase-root MuiPickersDay-root MuiPickersDay-dayWithMargin css-m42gyj-MuiButtonBase-root-MuiPickersDay-root
+import NotLoggedIn from "../NotLoggedIn/NotLoggedIn.js";
 
 const BookSession = () => {
-  // the value of the search field
-
   const [name, setName] = useState("");
   const [employees, setEmployee] = useState([]);
   const [foundResults, setFoundResults] = useState(employees);
@@ -128,7 +119,7 @@ const BookSession = () => {
   };
 
   useEffect(() => {
-    fetch("https://api.thepsycure.com/session")
+    fetch("http://localhost:8080/booking")
       .then((res) => res.json())
       .then((data) => {
         const filteredByDate = data.filter((d) => d.date == date.slice(0, 10));
@@ -281,13 +272,28 @@ const BookSession = () => {
       mediaQuery.removeListener(handleMediaQueryChange);
     };
   }, [mediaQuery]);
-  return (
-    <>
-      {pathname !== "/Dashboard/choose-your-employee" ? <AppAppBar /> : null}
+  const [mode, setMode] = React.useState("dark");
+  const [showCustomTheme, setShowCustomTheme] = React.useState(true);
+  const LPtheme = createTheme(getLPTheme(mode));
+  const defaultTheme = createTheme({ palette: { mode } });
 
-      <div style={{ marginBottom: "7rem" }}>
+  const toggleColorMode = () => {
+    setMode((prev) => (prev === "dark" ? "light" : "dark"));
+  };
+  return (
+    <ThemeProvider
+      sx={{ bgcolor: "background.default" }}
+      theme={showCustomTheme ? LPtheme : defaultTheme}
+    >
+      <CssBaseline />
+      <AppAppBar mode={mode} toggleColorMode={toggleColorMode} />
+
+      <Box
+        sx={{ bgcolor: "background.default" }}
+        // style={{ marginBottom: "7rem" }}
+      >
         <Container sx={{ flexGrow: 1 }}>
-          <Box className="SelectPsychotherapist">
+          <Box className="SelectEmployee">
             <h2
               style={{ textAlign: "center", marginTop: "30px" }}
               variant="h4"
@@ -307,55 +313,14 @@ const BookSession = () => {
               }}
             />
           </Box>
-          <div className="searching_container">
-            <div>
-              <Box style={{ textAlign: "center", widht: "100%" }}>
-                {/* <p>Search by Name</p> */}
-                <input
-                  value={name}
-                  onChange={filter}
-                  type="Search"
-                  placeholder="Search by Name"
-                  style={{
-                    width: "90%",
-                    borderRadius: "25px",
-                    padding: "10px 15px",
-                    outline: "none",
-                    marginTop: "10px",
-                    marginBottom: "10px",
-                  }}
-                />
-              </Box>
-            </div>
+          <div
+            className="searching_container"
+            style={{ display: "flex", justifyContent: "center" }}
+          >
             <div className="category_filter">
               <FormControl fullWidth>
                 <div className="flex_center">
-                  <p>Sort by Category</p>
-                  <select
-                    className="select"
-                    value={category?.category}
-                    onChange={handleChange}
-                  >
-                    <option value="all">All</option>
-                    {uniqueCategories?.map(
-                      (categories) =>
-                        categories && (
-                          <option
-                            value={categories}
-                            style={{ textTransform: "capitalize" }}
-                          >
-                            {categories}
-                          </option>
-                        )
-                    )}
-                  </select>
-                </div>
-              </FormControl>
-            </div>
-            <div className="category_filter">
-              <FormControl fullWidth>
-                <div className="flex_center">
-                  <p>Sort by Time</p>
+                  <p>Sort by Day</p>
                   <select
                     className="select"
                     value={availability}
@@ -364,33 +329,14 @@ const BookSession = () => {
                       setCheckingDate(new Date().toISOString().slice(0, 10));
                     }}
                   >
+                    <option value="">Saturday</option>
+                    <option value="">Sunday</option>
+                    <option value="">Monday</option>
+                    <option value="">Tuesday</option>
+                    <option value="">Wednesday</option>
+                    <option value="">Thursday</option>
+                    <option value="">Friday</option>
                     <option value="">All</option>
-                    <option value="7">weekly</option>
-                  </select>
-                </div>
-              </FormControl>
-            </div>
-            <div className="category_filter">
-              <FormControl fullWidth style={{ display: "flex" }}>
-                <div className="flex_center">
-                  <p>Sort by Price</p>
-                  <select
-                    className="select"
-                    value={category?.sessionType}
-                    onChange={handleSessionChange}
-                  >
-                    <option value="all">All</option>
-                    {uniqueCounselingTypes?.map(
-                      (counseling) =>
-                        counseling && (
-                          <option
-                            value={counseling}
-                            style={{ textTransform: "capitalize" }}
-                          >
-                            {counseling}
-                          </option>
-                        )
-                    )}
                   </select>
                 </div>
               </FormControl>
@@ -398,17 +344,17 @@ const BookSession = () => {
           </div>
           {/* card section  */}
 
-          <div className="all_psychologist">
+          <div className="all_employee">
             {foundResults.map((employee, index) => (
               <div className="group-37417">
                 <div
                   className="rectangle-59"
                   style={{
                     padding: "0px",
-                    height: " 440px",
+                    height: "100%",
                   }}
                 >
-                  <div
+                  {/* <div
                     className="image-main"
                     style={{
                       display: "flex",
@@ -435,50 +381,11 @@ const BookSession = () => {
                         srcset=""
                       />
                     </div>
-                  </div>
+                  </div> */}
                   <div>
-                    <p className="employee-name">{employee?.name}</p>
+                    <p className="employee-name">{employee?.email}</p>
                   </div>
-                  <div
-                    className="review"
-                    style={{
-                      marginTop: "2px",
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Rating
-                      className="rating-system"
-                      size="large"
-                      name="read-only"
-                      value={
-                        (((values[index].likedReview /
-                          values[index].totalReview) *
-                          100) /
-                          100) *
-                          5 ==
-                        5
-                          ? 5
-                          : 4.5
-                      }
-                      sx={{
-                        color: "black",
-                      }}
-                      precision={0.5}
-                      readOnly
-                    />
-                  </div>
-                  <div className="pricing">
-                    <p className="pricing-text">{employee?.amount}৳</p>
-                  </div>
-                  <div className="details">
-                    <div className="details-text">
-                      {employee?.yourself?.slice(0, 10)}
-                      <span className="faded-text">
-                        {employee?.yourself?.slice(10, 70)}
-                      </span>
-                    </div>
-                  </div>
+
                   <div className="group-btn">
                     <HashLink
                       to="#BookSession"
@@ -551,12 +458,8 @@ const BookSession = () => {
                       <StaticDatePicker
                         displayStaticWrapperAs="desktop"
                         openTo="day"
-                        // disabled
                         minDate={new Date()}
-                        // timezone="Asia/Dhaka"
                         shouldDisableDate={isWeekendDay}
-                        // renderDay={renderWeekPickerDay}
-                        // value={value}
                         onChange={handleValue}
                         renderInput={(params) => <TextField {...params} />}
                       />
@@ -581,13 +484,26 @@ const BookSession = () => {
                                 <div className="time-button-parent">
                                   <div
                                     className="time-button"
+                                    style={{
+                                      background: `${
+                                        mode == "dark" ? "#131b20" : "white"
+                                      }`,
+                                    }}
                                     onClick={() =>
                                       setTimeSelectionButton(
                                         !timeSelectionButton
                                       )
                                     }
                                   >
-                                    <button>Time</button>
+                                    <button
+                                      style={{
+                                        background: `${
+                                          mode == "dark" ? "#131b20" : "white"
+                                        }`,
+                                      }}
+                                    >
+                                      Time
+                                    </button>
                                     {timeSelectionButton ? (
                                       <span>⯆</span>
                                     ) : (
@@ -602,6 +518,9 @@ const BookSession = () => {
                                       display: timeSelectionButton
                                         ? "block"
                                         : "none",
+                                      background: `${
+                                        mode == "dark" ? "#131b20" : "white"
+                                      }`,
                                     }}
                                   >
                                     {selectedEmployees?.availableDateTimes.map(
@@ -654,7 +573,11 @@ const BookSession = () => {
                                                     time.startTime ===
                                                     selectedStartTime
                                                       ? "#fff"
-                                                      : "#F2F2F2",
+                                                      : `${
+                                                          mode == "light"
+                                                            ? "black"
+                                                            : "white"
+                                                        }`,
                                                 }}
                                                 variant="contained"
                                                 color="success"
@@ -701,15 +624,16 @@ const BookSession = () => {
                   )}
                 </div>
               ) : (
-                "Not logged in"
+                <NotLoggedIn colorMode={mode == "dark" ? "dark" : "light"} />
               )}
             </>
           ) : (
             <></>
           )}
         </Container>
-      </div>
-    </>
+        <Footer />
+      </Box>
+    </ThemeProvider>
   );
 };
 

@@ -9,15 +9,18 @@ import { v4 as uuidv4 } from "uuid";
 import { publicUserAuth, publicUserStorage } from "../../../firebase.config";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-import { LinearProgress, Typography } from "@mui/material";
+import { Alert, LinearProgress, Typography } from "@mui/material";
+import axios from "axios";
+import { CheckCircleOutline, DangerousOutlined } from "@mui/icons-material";
 // import { publicUserAuth } from "../../../firebase.config";
 
 const PublicUserUploadFile = () => {
- 
   const [selectedFile, setSelectedFile] = useState();
   const [user] = useAuthState(publicUserAuth);
   let [progress, setProgress] = useState(null);
   const [error, setError] = useState(null);
+  const [successStatus, setSuccessStatus] = useState("");
+  const [url, setUrl] = useState("");
   // Create the file metadata
   /** @type {any} */
   /* const metadata = {
@@ -34,10 +37,10 @@ const PublicUserUploadFile = () => {
       if (error) {
         setError(null);
       }
-      const storageRef = ref(
-        publicUserStorage,
-        `client/${user?.email}/` + selectedFile?.name + "-" + uuidv4()
-      );
+
+      const location =
+        `client/${user?.email}/` + selectedFile?.name + "-" + uuidv4();
+      const storageRef = ref(publicUserStorage, location);
 
       const uploadTask = uploadBytesResumable(storageRef, selectedFile);
       uploadTask.on(
@@ -76,13 +79,29 @@ const PublicUserUploadFile = () => {
         },
         async () => {
           // Upload completed successfully, now we can get the download URL
-          await getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            console.log("File available at", downloadURL);
-          });
+          await getDownloadURL(uploadTask.snapshot.ref).then(
+            async (downloadURL) => {
+              setUrl(downloadURL);
+              await axios
+                .post("http://localhost:8080/upload-file", {
+                  file: downloadURL,
+                  type: selectedFile?.type,
+                  uploadedBy: user?.email,
+                  location: location,
+                  fileName: selectedFile?.name,
+                })
+                .then((data) => setSuccessStatus(data.data))
+                .catch((error) => console.log(error));
+            }
+          );
         }
       );
     } else {
-      setError("File Size Can Not Exceed 100MB");
+      if (!selectedFile) {
+        setError("File Not Selected");
+      } else {
+        setError("File Size Can Not Exceed 100MB");
+      }
     }
   };
   return (
@@ -95,12 +114,37 @@ const PublicUserUploadFile = () => {
         <input
           type="file"
           onChange={(e) => {
+            setSuccessStatus("");
+            setProgress(null);
             const file = e.target.files ? e.target.files[0] : undefined;
             setSelectedFile(file);
           }}
         />
         <button onClick={handleUpload}>Upload file</button>
         {error && <Typography sx={{ color: "red" }}>{error}</Typography>}
+        {successStatus && (
+          <Alert
+            icon={
+              successStatus == "Successful" ? (
+                <CheckCircleOutline fontSize="inherit" />
+              ) : (
+                <DangerousOutlined />
+              )
+            }
+            severity={`${successStatus == "Successful" ? "success" : "error"}`}
+          >
+            {successStatus == "Successful" ? (
+              <p>
+                The file uploaded successfully and can be viewed at:
+                <a href={`${url}`} target="_blank" rel="_noreferrer">
+                  View
+                </a>
+              </p>
+            ) : (
+              "Could not upload"
+            )}
+          </Alert>
+        )}
         {progress && <LinearProgress variant="determinate" value={progress} />}
       </p>
     </div>

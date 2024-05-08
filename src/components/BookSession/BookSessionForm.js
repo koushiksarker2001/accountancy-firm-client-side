@@ -1,4 +1,5 @@
 import { Box, TextField, Typography } from "@mui/material";
+import "./BookSessionForm.css";
 import axios from "axios";
 import React, { useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -29,10 +30,14 @@ const BookSessionForm = ({ parsedItem }) => {
       <Typography variant="h5" textAlign="center">
         Book a session!
       </Typography>
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+      >
         {/* company name */}
         <div>
           <TextField
+            className="book-session-form"
             id="outlined-basic"
             label="Company Name"
             variant="outlined"
@@ -44,6 +49,7 @@ const BookSessionForm = ({ parsedItem }) => {
         {/* full name */}
         <div>
           <TextField
+            className="book-session-form"
             id="outlined-basic"
             label="Full Name"
             variant="outlined"
@@ -55,6 +61,7 @@ const BookSessionForm = ({ parsedItem }) => {
         {/* email */}
         <div style={{ margin: "2% 0" }}>
           <TextField
+            className="book-session-form"
             disabled
             id="filled-disabled"
             label="Email"
@@ -66,6 +73,7 @@ const BookSessionForm = ({ parsedItem }) => {
         {/* phone number */}
         <div>
           <TextField
+            className="book-session-form"
             id="outlined-basic"
             label="Full Name"
             variant="outlined"

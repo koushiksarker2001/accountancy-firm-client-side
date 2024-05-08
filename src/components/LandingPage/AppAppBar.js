@@ -25,6 +25,7 @@ import {
 } from "react-firebase-hooks/auth";
 import axios from "axios";
 import AccountMenu from "../PublicUserDashboard/AccountMenu/AccountMenu";
+import { ToastContainer, toast } from "react-toastify";
 const logoStyle = {
   width: "100px",
   padding: "0 10px",
@@ -96,6 +97,8 @@ function AppAppBar({ mode, toggleColorMode }) {
       .then(async (data) => {
         if (data.data?.email) {
           setAlreadyInUse(true);
+
+          toast.warn("Email already used");
         } else {
           const response = await createUserWithEmailAndPassword(
             email,
@@ -114,6 +117,8 @@ function AppAppBar({ mode, toggleColorMode }) {
                 }
               })
               .catch((err) => console.log(err));
+          } else {
+            toast.error("Sorry we could not process your request now");
           }
         }
       });
@@ -133,7 +138,11 @@ function AppAppBar({ mode, toggleColorMode }) {
 
           if (response?.user?.email) {
             handleSignInModalClose();
+          } else {
+            toast.warn("Email/Password is not correct");
           }
+        } else {
+          toast.error("Invalid Email/Password");
         }
       });
   };
@@ -185,27 +194,8 @@ function AppAppBar({ mode, toggleColorMode }) {
                 <img src={logo} style={logoStyle} alt="logo of sitemark" />
               </Link>
               <Box sx={{ display: { xs: "none", md: "flex" } }}>
-                <MenuItem
-                  onClick={() => scrollToSection("features")}
-                  sx={{ py: "6px", px: "12px" }}
-                >
-                  <Typography variant="body2" color="text.primary">
-                    Features
-                  </Typography>
-                </MenuItem>
-                <MenuItem
-                  onClick={() => scrollToSection("testimonials")}
-                  sx={{ py: "6px", px: "12px" }}
-                >
-                  <Typography variant="body2" color="text.primary">
-                    Testimonials
-                  </Typography>
-                </MenuItem>
-                <MenuItem
-                  onClick={() => scrollToSection("highlights")}
-                  sx={{ py: "6px", px: "12px" }}
-                >
-                  <Link to="/book-session">
+                <MenuItem sx={{ py: "6px", px: "12px" }}>
+                  <Link to="/book-session" style={{ textDecoration: "none" }}>
                     <Typography variant="body2" color="text.primary">
                       Contact Us
                     </Typography>
@@ -222,11 +212,12 @@ function AppAppBar({ mode, toggleColorMode }) {
                   </Typography>
                 </MenuItem>
                 <MenuItem
-                  onClick={() => scrollToSection("faq")}
+                  as={Link}
+                  to="/employee-login"
                   sx={{ py: "6px", px: "12px" }}
                 >
                   <Typography variant="body2" color="text.primary">
-                    FAQ
+                    Employee Login
                   </Typography>
                 </MenuItem>
               </Box>
@@ -460,6 +451,7 @@ function AppAppBar({ mode, toggleColorMode }) {
           </Modal>
         </div>
       </AppBar>
+      <ToastContainer />
     </div>
   );
 }

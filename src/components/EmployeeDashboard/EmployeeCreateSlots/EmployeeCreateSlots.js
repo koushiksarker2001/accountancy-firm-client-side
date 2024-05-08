@@ -98,13 +98,14 @@ const EmployeeCreateSlots = ({}) => {
     } else {
       meridian = "PM";
     }
-
+    console.log(time);
     return time.concat(" ", meridian);
   };
 
   const handleTime = (e) => {
     let time = e.target.value;
     let startTime = timeConverter(time);
+
     let endTime = handleEndTime(startTime);
     setTimeObj({ startTime, endTime });
   };
@@ -162,24 +163,22 @@ const EmployeeCreateSlots = ({}) => {
     const json = await response.json();
     console.log(json);
 
-    if (json!=='Successful') {
+    if (json !== "Successful") {
       alert("Something Went Wrong");
     }
-    if (json=='Successful') {
-      // setError(null);
-      // setSuccess("Session boked successfully");
+    if (json == "Successful") {
       setDetails({
         availableDateTimes: [],
       });
-      setDates({
+      /*  setDates({
         date: "",
         times: [],
-      });
+      }); */
+      setDates([]);
       setTimeObj({
         startTime: "",
         endTime: "",
       });
-      // navigate("/psychologist-dashboard");
     }
   };
   const [employee, setEmployee] = useState([]);
@@ -222,17 +221,10 @@ const EmployeeCreateSlots = ({}) => {
                   Date Selector
                 </Typography>
                 <Box style={{ display: "flex", flexDirection: "column" }}>
-                  {/* <Typography variant="p">Date</Typography>
-                                    <TextField
-                                        id="standard-basic"
-                                        name='name'
-                                        type='date'
-                                        variant="outlined"
-                                        value={selectedDate}
-                                        onChange={e => setSelectedDate(e.target.value)}
-                                    /> */}
-
-                  <FormControl fullWidth>
+                  <FormControl
+                    fullWidth
+                    disabled={dates.length > 0 ? true : false}
+                  >
                     <InputLabel id="cateogory">Select Available Day</InputLabel>
                     <Select
                       labelId="cateogory"
@@ -333,25 +325,14 @@ const EmployeeCreateSlots = ({}) => {
                     variant="outlined"
                     value={timeObj.startTime.split(" ")[0]}
                     onChange={handleTime}
+                    disabled={dates.length > 0 ? true : false}
                   />
                 </Box>
 
-                {/* <Box style={{ display: "flex", flexDirection: "column" }}>
-                                    <Typography variant="p">End Time</Typography>
-                                    <TextField
-                                        id="standard-basic"
-                                        // label="End Time"
-                                        name='name'
-                                        type='time'
-                                        variant="outlined"
-                                        value={timeObj.endTime.split(" ")[0]}
-                                        onChange={handleEndTime}
-                                    />
-                                </Box> */}
                 <Box style={{ marginTop: "2rem" }}>
                   <Button
                     onClick={handleAdd}
-                    style={{ background: "#31C75A", color: "#fff" }}
+                    style={{ background: "#074785", color: "#fff" }}
                   >
                     Add
                   </Button>
@@ -377,7 +358,7 @@ const EmployeeCreateSlots = ({}) => {
                     },
                   }}
                 >
-                  Schedule
+                  Current Schedule
                 </Typography>
 
                 {employee?.length
@@ -421,18 +402,6 @@ const EmployeeCreateSlots = ({}) => {
                                         )
                                       }
                                     ></Delete>
-                                    {/* <img
-                                       onClick={() =>
-                                        handleDelete(dateTimes.date, time)
-                                      }
-                                      src={deleteIcon}
-                                      alt="deleteicon"
-                                      style={{
-                                        width: "1.5rem",
-                                        height: "1.5rem",
-                                        cursor: "pointer",
-                                      }}
-                                    /> */}
                                   </Grid>
                                 </>
                               ))}
@@ -449,21 +418,19 @@ const EmployeeCreateSlots = ({}) => {
           </Grid>
 
           {/* Submitting Button */}
-          <Box style={{ textAlign: "right" }}>
+          <Box style={{ textAlign: "center" }}>
             <Button
               onClick={handleSubmit}
               style={{
-                backgroundColor: "#31C75A",
+                backgroundColor: "#074785",
                 marginTop: "1rem",
                 padding: "20px 30px",
                 borderRadius: "15px",
                 color: "white",
-                marginRight: "20px",
               }}
             >
               Submit
             </Button>
-            {/* <Button onClick={() => setPage(1)} style={{ backgroundColor: '#31C75A', marginTop: '1rem', padding: '20px 30px', borderRadius: '15px', color: 'white', float: 'right', marginRight: '20px' }}>Back</Button> */}
           </Box>
           {error && <p style={{ color: "red" }}>{error}</p>}
         </Box>

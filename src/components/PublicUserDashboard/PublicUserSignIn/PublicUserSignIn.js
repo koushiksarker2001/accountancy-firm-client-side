@@ -1,11 +1,14 @@
 import {
+  Backdrop,
   Box,
+  CircularProgress,
   Container,
   CssBaseline,
   Typography,
   createTheme,
 } from "@mui/material";
 import React from "react";
+import Footer from "../../LandingPage/Footer.js";
 import getLPTheme from "../../LandingPage/getLPTheme";
 import { ThemeProvider } from "@emotion/react";
 import AppAppBar from "../../LandingPage/AppAppBar";
@@ -17,6 +20,7 @@ import {
 } from "react-firebase-hooks/auth";
 import { employeeAuth, publicUserAuth } from "../../../firebase.config";
 import { useLocation, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 const PublicUserSignIn = () => {
   const [mode, setMode] = React.useState("dark");
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
@@ -40,14 +44,16 @@ const PublicUserSignIn = () => {
   if (loggedUser) {
     navigate(from, { replace: true });
   }
-  if (loggedLoading || loading) {
+  /*   if (loggedLoading || loading) {
     return <p>Loading...</p>;
-  }
+  } */
   const onSubmit = async (data) => {
     const { email, password } = data;
     const response = await signInWithEmailAndPassword(email, password);
     if (response?.user?.email) {
       navigate(from, { replace: true });
+    } else {
+      toast.warn("Invalid Email/Password");
     }
   };
 
@@ -85,6 +91,7 @@ const PublicUserSignIn = () => {
               alignItems: "center",
               background: "white",
               padding: "20px",
+              backgroundColor: ``,
             }}
             onSubmit={handleSubmit(onSubmit)}
           >
@@ -113,14 +120,20 @@ const PublicUserSignIn = () => {
               <span style={{ color: "red" }}>Password field is required</span>
             )}
 
-            <input
-              className="employee-input"
-              type="submit"
-              style={{ width: "80%" }}
-            />
+            {loggedLoading || loading ? (
+              <CircularProgress color="inherit" />
+            ) : (
+              <input
+                className="employee-input employee-input-button"
+                type="submit"
+                style={{ width: "80%" }}
+              />
+            )}
           </form>
         </Container>
       </Box>
+      <Footer />
+      <ToastContainer />
     </ThemeProvider>
   );
 };
