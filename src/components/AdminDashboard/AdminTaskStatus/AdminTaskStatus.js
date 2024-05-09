@@ -1,7 +1,7 @@
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, TextField, Typography } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-
+import "./AdminTaskStatus.css";
 const AdminTaskStatus = () => {
   const [employee, setEmployee] = useState([]);
   const [select, setSelect] = useState("");
@@ -19,8 +19,8 @@ const AdminTaskStatus = () => {
       .catch((err) => console.log(err));
   }, [select]);
   return (
-    <div style={{ width: "500px" }}>
-      <label>Select Employee: </label>
+    <div style={{ width: "100%" }}>
+      <Typography variant="h6">Select Employee: </Typography>
       <Autocomplete
         fullWidth
         disablePortal
@@ -34,7 +34,7 @@ const AdminTaskStatus = () => {
           <TextField {...params} label="Employee List" required />
         )}
       />
-      <table border="1" style={{ borderSpacing: "10px" }}>
+      <table border="0" style={{ width: "100%", textAlign: "center" }}>
         <caption style={{ fontSize: "20px" }}>Tasks Status</caption>
         <thead>
           <th>Task Name</th>
@@ -44,7 +44,7 @@ const AdminTaskStatus = () => {
         </thead>
         <tbody>
           {tasks?.map((task) => (
-            <tr>
+            <tr className="table-row">
               <td>{task?.taskName}</td>
               <td>{task?.taskDescription}</td>
               <td>{task?.taskDeadline}</td>

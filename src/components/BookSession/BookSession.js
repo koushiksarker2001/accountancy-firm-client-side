@@ -42,7 +42,7 @@ const BookSession = () => {
   const [date, setDate] = useState("");
   const [allSession, setAllSession] = useState("");
   const [userDetail, setUserDetail] = useState({});
-  const [availability, setAvailability] = useState();
+  const [availability, setAvailability] = useState("All");
   const [checkingDate, setCheckingDate] = useState();
   const [category, setCategory] = useState({
     category: "",
@@ -66,10 +66,11 @@ const BookSession = () => {
   }, [selectedStartTime, value]);
 
   let navigate = useNavigate();
-
+  const [tempEmployee, setTempEmployee] = useState([]);
   useLayoutEffect(() => {
     function updateScreen(time) {
       // Make visual updates here.
+
       if (employees?.length === 0) {
         setIsLoading(true);
         fetch("http://localhost:8080/employee")
@@ -80,13 +81,14 @@ const BookSession = () => {
             );
             setEmployee(approvedEmployee);
             setFoundResults(approvedEmployee);
+            setTempEmployee(approvedEmployee);
             setIsLoading(false);
           });
       }
     }
 
     requestAnimationFrame(updateScreen);
-  }, [employees]);
+  }, [employees, availability]);
 
   /* ======== Filter by Categories ====== */
 
@@ -221,6 +223,7 @@ const BookSession = () => {
       startTime: time.startTime,
       endTime: time.endTime,
       date: date.slice(0, 10),
+      originalDate: date,
       day: value,
       status: "incomplete",
       selectedEmployees,
@@ -241,15 +244,6 @@ const BookSession = () => {
     setCategory({ ...category, sessionType: selectSession });
   };
 
-  const values = foundResults?.map((employee) => {
-    let totalReview, likedReview;
-    totalReview = employee.reviews?.length;
-    likedReview = employee.reviews?.filter(
-      (review) => review.rating === "like"
-    )?.length;
-
-    return { totalReview, likedReview };
-  });
   const [timeSelectionButton, setTimeSelectionButton] = useState(false);
 
   const { pathname } = useLocation();
@@ -280,6 +274,20 @@ const BookSession = () => {
   const toggleColorMode = () => {
     setMode((prev) => (prev === "dark" ? "light" : "dark"));
   };
+  useEffect(() => {
+    if (availability !== "All") {
+      const found = tempEmployee.filter(
+        (foundResult) =>
+          foundResult.availableDateTimes.filter(
+            (availableDateTime) => availableDateTime.date == availability
+          ).length > 0
+      );
+      setFoundResults(found);
+    } else {
+      setFoundResults(tempEmployee);
+    }
+  }, [availability, tempEmployee]);
+  // console.log(foundResults);
   return (
     <ThemeProvider
       sx={{ bgcolor: "background.default" }}
@@ -329,14 +337,14 @@ const BookSession = () => {
                       setCheckingDate(new Date().toISOString().slice(0, 10));
                     }}
                   >
-                    <option value="">Saturday</option>
-                    <option value="">Sunday</option>
-                    <option value="">Monday</option>
-                    <option value="">Tuesday</option>
-                    <option value="">Wednesday</option>
-                    <option value="">Thursday</option>
-                    <option value="">Friday</option>
-                    <option value="">All</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="All">All</option>
                   </select>
                 </div>
               </FormControl>

@@ -302,9 +302,7 @@ const ChannelForm = (props) => {
   }, []);
   // verify the time if its today or passed
   const verified = session?.date === today;
-  console.log(verifiedTime);
   const verifiedPassed = session?.date < today;
-  console.log(verifiedPassed);
   // console.log(verified, verifiedPassed);
   // console.log(today);
   /* useEffect(() => {

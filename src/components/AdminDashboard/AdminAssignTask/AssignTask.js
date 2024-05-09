@@ -1,4 +1,4 @@
-import { Autocomplete, Button, TextField } from "@mui/material";
+import { Autocomplete, Button, TextField, Typography } from "@mui/material";
 import {
   DateTimePicker,
   LocalizationProvider,
@@ -8,6 +8,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import axios from "axios";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
 const AssignTask = () => {
   const [employee, setEmployee] = useState([]);
@@ -39,16 +40,20 @@ const AssignTask = () => {
     };
     axios
       .post("http://localhost:8080/create-task", body)
-      .then((data) => console.log(data.data))
+      .then((data) =>
+        data.data == "Successful"
+          ? toast.success(`Successfully assigned task to: ${assign} `)
+          : "Failed to assign"
+      )
       .catch((err) => console.log(err));
   };
   return (
-    <div>
+    <div style={{ width: "50%" }}>
       <form
-        style={{ display: "flex", flexDirection: "column" }}
+        style={{ display: "flex", flexDirection: "column", gap: "20px" }}
         onSubmit={handleSubmit}
       >
-        <label>Assign to: </label>
+        <Typography variant="h6" style={{ textAlign: "center" }}></Typography>
         <Autocomplete
           fullWidth
           disablePortal
@@ -86,6 +91,7 @@ const AssignTask = () => {
         </LocalizationProvider>
         <Button type="submit">Assign Task</Button>
       </form>
+      <ToastContainer />
     </div>
   );
 };

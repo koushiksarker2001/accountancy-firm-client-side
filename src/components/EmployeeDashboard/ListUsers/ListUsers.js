@@ -146,7 +146,13 @@ const ListUsers = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <form onSubmit={(event) => handleSubmit(event)}>
+          <Typography variant="h6" sx={{ textAlign: "center" }}>
+            Update client details
+          </Typography>
+          <form
+            onSubmit={(event) => handleSubmit(event)}
+            style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+          >
             <TextField
               fullWidth
               id="outlined-basic"

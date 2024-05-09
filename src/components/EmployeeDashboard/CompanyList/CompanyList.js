@@ -30,6 +30,7 @@ import { saveAs } from "file-saver";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
+import { ToastContainer, toast } from "react-toastify";
 function createData(
   clientEmail,
   companyName,
@@ -252,10 +253,15 @@ const CompanyList = () => {
         annualReturnDone: annualReturnDone,
         annualReturnDue: annualReturnDue,
       })
-      .then(
-        (data) => data.data == "Successful" && setUpdateStatus(!updateStatus)
-      )
-      .catch((err) => console.log(err));
+      .then((data) => {
+        data.data == "Successful"
+          ? setUpdateStatus(!updateStatus)
+          : setUpdateStatus(!updateStatus);
+        data.data == "Successful"
+          ? toast.success("Successfully updated company details")
+          : toast.warn("Failed to update company details");
+      })
+      .catch((err) => toast.error("Server offline"));
     handleClose();
   };
 
@@ -263,17 +269,22 @@ const CompanyList = () => {
     <div>
       <Button onClick={handleExportToExcel}>Export as excel</Button>
       <Box>
-        <form onSubmit={handleSearch}>
+        <form
+          onSubmit={handleSearch}
+          style={{ display: "flex", alignItems: "center", gap: "10px" }}
+        >
           <TextField
             id="outlined-basic"
             label="Search by company reg"
             variant="outlined"
             onChange={(e) => setCompanySearch(e.target.value)}
           />
-          <button type="submit">Search</button>
+          <Button type="submit" variant="contained">
+            Search
+          </Button>
         </form>
       </Box>
-      <Box>
+      <Box sx={{ margin: "10px 0" }}>
         <form>
           <FormControl sx={{ width: "200px" }}>
             <InputLabel id="demo-simple-select-label">Sort By</InputLabel>
@@ -351,7 +362,10 @@ const CompanyList = () => {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <form onSubmit={handleUpdate}>
+            <form
+              onSubmit={handleUpdate}
+              style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+            >
               {/* annual return done */}
               <Typography variant="h5" sx={{ textAlign: "center" }}>
                 Update Company Dates
@@ -398,6 +412,7 @@ const CompanyList = () => {
           </Box>
         </Modal>
       </div>
+      <ToastContainer />
     </div>
   );
 };

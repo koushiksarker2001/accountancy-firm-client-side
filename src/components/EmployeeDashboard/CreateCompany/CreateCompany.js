@@ -5,6 +5,7 @@ import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import axios from "axios";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
 const CreateCompany = () => {
   const [clientEmail, setClientEmail] = useState("");
@@ -57,18 +58,30 @@ const CreateCompany = () => {
     };
     await axios
       .post("http://localhost:8080/create-company", body)
-      .then((data) => setSuccessStatus(data.data))
-      .catch((err) => console.log(err));
+      .then((data) => {
+        setSuccessStatus(data.data);
+        data.data == "Successful"
+          ? toast.success("Company created successfully")
+          : toast.warn("Failed to create");
+      })
+      .catch((err) => toast.error("Server offline"));
   };
 
   return (
     <div>
-      <Typography variant="h5">Create a new company</Typography>
       <Box>
         <form
           onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column" }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            width: "50%",
+          }}
         >
+          <Typography variant="h5" style={{ textAlign: "center" }}>
+            Create a new company
+          </Typography>
           {/* Client email */}
           <TextField
             id="outlined-basic"
@@ -156,9 +169,15 @@ const CreateCompany = () => {
               {successStatus}
             </Typography>
           )}
-          <button type="submit">Submit</button>
+          <button
+            type="submit"
+            className="employee-input employee-input-button"
+          >
+            Submit
+          </button>
         </form>
       </Box>
+      <ToastContainer />
     </div>
   );
 };
