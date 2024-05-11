@@ -303,18 +303,7 @@ const ChannelForm = (props) => {
   // verify the time if its today or passed
   const verified = session?.date === today;
   const verifiedPassed = session?.date < today;
-  // console.log(verified, verifiedPassed);
-  // console.log(today);
-  /* useEffect(() => {
-    if (
-      (session?.date && reviewDateConverter(session?.date) == today) ||
-      (session?.date &&
-        reviewDateConverter(session?.date) >= session?.date &&
-        session?.endTime < currentTime)
-    ) {
-      navigate(`/Dashboard/review/${session._id}`);
-    }
-  }, [verifiedPassed, session]); */
+ 
   return (
     <>
       {verified && verifiedTime ? (

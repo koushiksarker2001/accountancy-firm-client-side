@@ -132,7 +132,6 @@ function AppAppBar({ mode, toggleColorMode }) {
     await axios
       .get(`http://localhost:8080/public-user/${email}`)
       .then(async (data) => {
-        console.log(data);
         if (data?.data) {
           const response = await signInWithEmailAndPassword(email, password);
 
@@ -329,7 +328,7 @@ function AppAppBar({ mode, toggleColorMode }) {
           </Toolbar>
         </Container>
         <div>
-          {/* <Button onClick={handleOpen}>Open modal</Button> */}
+          {/*Sign up procedure*/}
           <Modal
             open={modalOpen}
             onClose={handleClose}

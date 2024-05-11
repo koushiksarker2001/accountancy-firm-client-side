@@ -27,10 +27,8 @@ const PublicUserUploadFile = () => {
     contentType: "image/jpeg",
   }; */
 
-  // Upload file and metadata to the object 'images/mountains.jpg'
-
+  // Upload file and metadata to the object 
   // Listen for state changes, errors, and completion of the upload.
-  console.log(selectedFile);
   const handleUpload = () => {
     const size = selectedFile?.size / 1000000;
     if (size <= 100) {
@@ -60,8 +58,7 @@ const PublicUserUploadFile = () => {
           }
         },
         (error) => {
-          // A full list of error codes is available at
-          // https://firebase.google.com/docs/storage/web/handle-errors
+        
           switch (error.code) {
             case "storage/unauthorized":
               // User doesn't have permission to access the object
@@ -107,10 +104,7 @@ const PublicUserUploadFile = () => {
   return (
     <div>
       <p>
-        {/* {error && <strong>Error: {error.message}</strong>}
-        {uploading && <span>Uploading file...</span>}
-        {snapshot && <span>Snapshot: {JSON.stringify(snapshot)}</span>}
-        {selectedFile && <span>Selected file: {selectedFile.name}</span>} */}
+    
         <input
           type="file"
           onChange={(e) => {

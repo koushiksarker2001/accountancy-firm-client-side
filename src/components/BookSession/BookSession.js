@@ -90,31 +90,6 @@ const BookSession = () => {
     requestAnimationFrame(updateScreen);
   }, [employees, availability]);
 
-  /* ======== Filter by Categories ====== */
-
-  // the search result
-  const filter = (e) => {
-    const keyword = e.target.value;
-
-    if (keyword !== "") {
-      const results = employees
-        ?.filter((employee) => {
-          return (
-            employee.name.toLowerCase().includes(keyword.toLowerCase()) &&
-            employee?.approved
-          );
-        })
-        .sort((a, b) => new Date(a?.createdAt) - new Date(b?.createdAt));
-      setFoundResults(results);
-    } else {
-      let sorted = employees
-        ?.filter((employee) => employee?.approved === true)
-        ?.sort((a, b) => new Date(a?.createdAt) - new Date(b?.createdAt));
-      setFoundResults(sorted);
-    }
-
-    setName(keyword);
-  };
 
   const handleSelectValue = (selectedEmployees) => {
     setSelectedEmployees(selectedEmployees);
@@ -234,15 +209,6 @@ const BookSession = () => {
     setParsedItem(JSON.parse(localStorage?.getItem("selectedDetails")));
   };
 
-  const handleChange = (e) => {
-    const selectCategory = e.target.value;
-    setCategory({ ...category, category: selectCategory });
-  };
-
-  const handleSessionChange = (e) => {
-    const selectSession = e.target.value;
-    setCategory({ ...category, sessionType: selectSession });
-  };
 
   const [timeSelectionButton, setTimeSelectionButton] = useState(false);
 
@@ -274,6 +240,7 @@ const BookSession = () => {
   const toggleColorMode = () => {
     setMode((prev) => (prev === "dark" ? "light" : "dark"));
   };
+  
   useEffect(() => {
     if (availability !== "All") {
       const found = tempEmployee.filter(

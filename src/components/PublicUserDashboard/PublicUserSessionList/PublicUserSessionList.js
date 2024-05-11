@@ -33,7 +33,7 @@ const PublicUserSessionList = () => {
       })
       .catch((err) => console.log(err));
   }, [user]);
-  console.log(session);
+  
   return (
     <TableContainer component={Paper}>
       <Table>

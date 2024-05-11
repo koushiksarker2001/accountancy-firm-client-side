@@ -1,7 +1,7 @@
 import "./App.css";
 
 import LandingPage from "./components/LandingPage/LandingPage.js";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Router, BrowserRouter } from "react-router-dom";
 import Services from "./components/LandingPage/Services.js";
 import EmployeeSignIn from "./components/EmployeeDashboard/EmployeeSignIn/EmployeeSignIn.js";
 import AdminLogin from "./components/AdminDashboard/AdminLogin/AdminLogin.js";
@@ -37,7 +37,7 @@ import PublicUserSessionList from "./components/PublicUserDashboard/PublicUserSe
 import UploadedFiles from "./components/PublicUserDashboard/UploadedFiles/UploadedFiles.js";
 function App() {
   return (
-    <div>
+    <BrowserRouter>
       <Routes>
         {/* anonymous user */}
         <Route element={<LandingPage />} path="/" />
@@ -265,7 +265,7 @@ function App() {
 
         {/* chat route ends */}
       </Routes>
-    </div>
+    </BrowserRouter>
   );
 }
 
